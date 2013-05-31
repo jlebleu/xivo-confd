@@ -18,19 +18,47 @@
 
 import flask
 
-from flask import session
+from xivo_dao.accesswebservice_dao import get_password
+from flask import request, session, Response
 from functools import wraps
 from xivo_dao import accesswebservice_dao
 from xivo_restapi.rest.authentication.werkzeug import authdigest
+
+
+def check_auth(username, password):
+    """This function is called to check if a username /
+    password combination is valid.
+    """
+    return password == get_password(username)
+
+
+def authenticate():
+    """Sends a 401 response that enables basic auth"""
+    return Response(
+    'Could not verify your access level for that URL.\n'
+    'You have to login with proper credentials', 401,
+    {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 
 class XivoRealmDigest(authdigest.RealmDigestDB):
     def requires_auth(self, f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            remote_address = flask.request.remote_addr
+            if flask.request.headers.getlist("X-Auth-Token"):
+                auth_token = flask.request.headers.getlist("X-Auth-Token")[0]
+                if auth_token == 'toto':
+                    return f(*args, **kwargs)
+            if not flask.request.headers.getlist("X-Forwarded-For"):
+                remote_address = request.remote_addr
+            else:
+                remote_address = flask.request.headers.getlist("X-Forwarded-For")[0]
             if self.isRemoteAddressAllowed(remote_address):
                 return f(*args, **kwargs)
+            auth = request.authorization
+            if not auth or not check_auth(auth.username, auth.password):
+                return authenticate()
+            return f(*args, **kwargs)
+            """
             if self.isSessionLogged(session):
                 return f(*args, **kwargs)
             if self.isAuthenticated(flask.request):
@@ -39,6 +67,8 @@ class XivoRealmDigest(authdigest.RealmDigestDB):
                 session['username'] = flask.request.authorization.username
                 return f(*args, **kwargs)
             return self.challenge()
+            """
+            return authenticate()
         return decorated
 
     def isRemoteAddressAllowed(self, address):

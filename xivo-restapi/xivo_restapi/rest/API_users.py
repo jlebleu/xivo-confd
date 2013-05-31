@@ -31,6 +31,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+from xivo_restapi.rest import crossdomain
+
 
 class APIUsers(object):
 
@@ -41,6 +43,7 @@ class APIUsers(object):
     @exception_catcher
     @produces('application/json')
     @realmDigest.requires_auth
+    @crossdomain.crossdomain(origin='*', headers=['X-Auth-Token'])
     def list(self):
         logger.info("List of users requested.")
         result = self._user_management.get_all_users()
