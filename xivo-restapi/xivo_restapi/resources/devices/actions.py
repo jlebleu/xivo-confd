@@ -127,21 +127,3 @@ def autoprov(deviceid):
     device = device_services.get(deviceid)
     device_services.reset_to_autoprov(device)
     return make_response('', 204)
-
-
-@route('/<deviceid>/associate_line/<int:lineid>')
-@limit_to_localhost
-def associate_line(deviceid, lineid):
-    device = device_services.get(deviceid)
-    line = line_services.get(lineid)
-    device_services.associate_line_to_device(device, line)
-    return make_response('', 204)
-
-
-@route('/<deviceid>/remove_line/<int:lineid>')
-@limit_to_localhost
-def remove_line(deviceid, lineid):
-    device = device_services.get(deviceid)
-    line = line_services.get(lineid)
-    device_services.remove_line_from_device(device, line)
-    return make_response('', 204)

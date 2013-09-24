@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA..
 
-from mock import patch
+from mock import Mock, patch
 from hamcrest import assert_that, equal_to
 
 from xivo_dao.data_handler.line.model import Line
@@ -250,3 +250,81 @@ class TestLineActions(TestResources):
 
         mock_line_services_get.assert_called_with(line_id)
         self.assertEqual(expected_status_code, result.status_code)
+
+    @patch('xivo_restapi.helpers.request_bouncer.request')
+    def test_associate_device_garbage_input(self, request):
+        data = 'aslkt7P)9]\\'
+        line_id = 3245
+        expected_status_code = 400
+        request.remote_addr = '127.0.0.1'
+
+        result = self.app.post("%s/%d/device" % (BASE_URL, line_id), data=data)
+
+        self.assertEqual(expected_status_code, result.status_code)
+
+    @patch('xivo_restapi.helpers.request_bouncer.request')
+    def test_associate_device_no_device_id_in_input(self, request):
+        data = self._serialize_encode({'wrong_key': None})
+        line_id = 3245
+        expected_status_code = 400
+        request.remote_addr = '127.0.0.1'
+
+        result = self.app.post("%s/%d/device" % (BASE_URL, line_id), data=data)
+
+        self.assertEqual(expected_status_code, result.status_code)
+
+    @patch('xivo_restapi.helpers.request_bouncer.request')
+    @patch('xivo_dao.data_handler.device.services.associate_line_to_device')
+    @patch('xivo_dao.data_handler.line.services.get')
+    @patch('xivo_dao.data_handler.device.services.get')
+    def test_associate_device(self, device_get, line_get, associate_device, request):
+        line_id = 3498
+        device_id = 'abcdef'
+        data = self._serialize_encode({'device_id': device_id})
+        expected_status_code = 204
+        device = device_get.return_value = Mock()
+        line = line_get.return_value = Mock()
+        request.remote_addr = '127.0.0.1'
+
+        result = self.app.post("%s/%d/device" % (BASE_URL, line_id), data=data)
+
+        self.assertEqual(expected_status_code, result.status_code)
+        device_get.assert_called_once_with(device_id)
+        line_get.assert_called_once_with(line_id)
+        associate_device.assert_called_once_with(device, line)
+
+    @patch('xivo_restapi.helpers.request_bouncer.request')
+    @patch('xivo_dao.data_handler.device.services.remove_line_from_device')
+    @patch('xivo_dao.data_handler.line.services.get')
+    @patch('xivo_dao.data_handler.line_device.services.find_device_from_line')
+    def test_deassociate_device(self, find_device_from_line, line_get, deassociate_device, request):
+        line_id = 3498
+        expected_status_code = 204
+        device = find_device_from_line.return_value = Mock()
+        line = line_get.return_value = Mock()
+        request.remote_addr = '127.0.0.1'
+
+        result = self.app.delete("%s/%d/device" % (BASE_URL, line_id))
+
+        self.assertEqual(expected_status_code, result.status_code)
+        line_get.assert_called_once_with(line_id)
+        find_device_from_line.assert_called_once_with(line)
+        deassociate_device.assert_called_once_with(device, line)
+
+    @patch('xivo_restapi.helpers.request_bouncer.request')
+    @patch('xivo_dao.data_handler.device.services.remove_line_from_device')
+    @patch('xivo_dao.data_handler.line.services.get')
+    @patch('xivo_dao.data_handler.line_device.services.find_device_from_line')
+    def test_deassociate_device_no_device(self, find_device_from_line, line_get, deassociate_device, request):
+        line_id = 3498
+        expected_status_code = 204
+        find_device_from_line.return_value = None
+        line = line_get.return_value = Mock()
+        request.remote_addr = '127.0.0.1'
+
+        result = self.app.delete("%s/%d/device" % (BASE_URL, line_id))
+
+        self.assertEqual(expected_status_code, result.status_code)
+        line_get.assert_called_once_with(line_id)
+        find_device_from_line.assert_called_once_with(line)
+        assert_that(deassociate_device.call_count, equal_to(0))

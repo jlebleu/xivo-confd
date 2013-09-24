@@ -23,11 +23,15 @@ from ..user_links.actions import formatter as user_link_formatter
 from flask import Blueprint
 from flask.globals import request
 from flask.helpers import make_response
+from xivo_dao.data_handler.device import services as device_services
+from xivo_dao.data_handler.exception import MissingParametersError
 from xivo_dao.data_handler.line.model import Line
 from xivo_dao.data_handler.line import services as line_services
+from xivo_dao.data_handler.line_device import services as line_device_services
 from xivo_dao.data_handler.user_line_extension import services as ule_services
 from xivo_restapi import config
 from xivo_restapi.helpers import serializer
+from xivo_restapi.helpers.request_bouncer import limit_to_localhost
 from xivo_restapi.helpers.route_generator import RouteGenerator
 from xivo_restapi.helpers.formatter import Formatter
 
@@ -61,3 +65,30 @@ def list_user_links(lineid):
     line = ule_services.find_all_by_line_id(lineid)
     result = user_link_formatter.list_to_api(line)
     return make_response(result, 200)
+
+
+@route('/<int:lineid>/device', methods=['POST'])
+@limit_to_localhost
+def associate_device(lineid):
+    data = request.data.decode("utf-8")
+    data_decoded = serializer.decode(data)
+
+    if not isinstance(data_decoded, dict) or 'device_id' not in data_decoded:
+        raise MissingParametersError(['device_id'])
+
+    device = device_services.get(data_decoded['device_id'])
+    line = line_services.get(lineid)
+
+    device_services.associate_line_to_device(device, line)
+
+    return make_response('', 204)
+
+
+@route('/<int:lineid>/device', methods=['DELETE'])
+@limit_to_localhost
+def deassociate_device(lineid):
+    line = line_services.get(lineid)
+    device = line_device_services.find_device_from_line(line)
+    if device:
+        device_services.remove_line_from_device(device, line)
+    return make_response('', 204)
