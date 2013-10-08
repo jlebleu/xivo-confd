@@ -79,8 +79,8 @@ class TestLineActions(TestResources):
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
-    @patch('xivo_dao.data_handler.line.services.find_all_by_name')
-    def test_list_lines_with_search(self, mock_line_services_find_all_by_name):
+    @patch('xivo_dao.data_handler.line.services.find_all_by_username')
+    def test_list_lines_with_search(self, mock_line_services_find_all_by_username):
         line = Line(id=1,
                     name='Bob')
 
@@ -101,11 +101,11 @@ class TestLineActions(TestResources):
             ]
         }
 
-        mock_line_services_find_all_by_name.return_value = [line]
+        mock_line_services_find_all_by_username.return_value = [line]
 
         result = self.app.get("%s?q=%s" % (BASE_URL, search))
 
-        mock_line_services_find_all_by_name.assert_called_once_with(search)
+        mock_line_services_find_all_by_username.assert_called_once_with(search)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 

@@ -41,7 +41,7 @@ formatter = Formatter(mapper, serializer, Line)
 @route('')
 def list():
     if 'q' in request.args:
-        lines = line_services.find_all_by_name(request.args['q'])
+        lines = line_services.find_all_by_username(request.args['q'])
     else:
         lines = line_services.find_all()
 
