@@ -407,18 +407,19 @@ Feature: REST API Devices
             | mytemplate | My Template |
         Given the plugin "null" is installed
         Given I have the following devices:
-            | ip       | mac               | plugin | model     | vendor     | version | template_id         |
-            | 10.0.0.1 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
-            | 10.0.0.2 | aa:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
-            | 10.0.0.3 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
+            | ip              | mac               | plugin | model     | vendor     | version | template_id         |
+            | 255.255.255.251 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
+            | 255.255.255.252 | aa:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
+            | 255.255.255.253 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
+            | 255.255.255.254 | bb:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
         When I request a list of devices with the following query parameters:
             | order | direction | limit | skip |
             | ip    | desc      | 2     | 1    |
         Then I get a response with status "200"
         Then I get a list of devices in the following order:
-            | ip       | mac               | plugin | model     | vendor     | version | template_id         |
-            | 10.0.0.2 | aa:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
-            | 10.0.0.1 | 22:11:22:33:44:55 | null   | nullmodel | nullvendor | 1.0     | mytemplate          |
+            | ip              | mac               | plugin | model     | vendor     | version | template_id         |
+            | 255.255.255.253 | 00:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
+            | 255.255.255.252 | aa:11:22:33:44:56 | null   | nullmodel | nullvendor | 1.0     | defaultconfigdevice |
         Then I get a list with 2 devices
 
     Scenario: Reset to autoprov a device
@@ -461,3 +462,14 @@ Feature: REST API Devices
         Given there are no devices with id "abcd"
         When I delete the device "abcd" from restapi
         Then I get a response with status "404"
+
+    Scenario: Delete a device associated to a line
+        Given I have the following devices:
+            | id | ip       | mac               |
+            | 20 | 10.0.0.1 | 00:00:00:00:00:12 |
+        Given there are users with infos:
+            | firstname | lastname | number | context | protocol |            device |
+            | Aayla     | Secura   |   1234 | default | sip      | 00:00:00:00:00:12 |
+        When I delete the device "20" from restapi
+        Then I get a response with status "400"
+        Then I get an error message "Error while deleting device: device is still linked to a line"
