@@ -30,7 +30,7 @@ Feature: Link a user and a voicemail
         When I link user "Tuvok Vulcan" with voicemail "1063@default" via RESTAPI
         Then I get a response with status "201"
         Then I get a response with a voicemail id
-        Then I get a response with a user id
+        Then I get a response with a user id via RESTAPI
         Then I get a header with a location matching "/1.1/users/\d+/voicemail"
         Then I get a response with a link to the "voicemails" resource using the id "voicemail_id"
         Then I get a response with a link to the "users" resource using the id "user_id"
@@ -45,7 +45,7 @@ Feature: Link a user and a voicemail
         When I link user "Tom Paris" with voicemail "1064@default" via RESTAPI
         Then I get a response with status "201"
         Then I get a response with a voicemail id
-        Then I get a response with a user id
+        Then I get a response with a user id via RESTAPI
         Then I get a header with a location matching "/1.1/users/\d+/voicemail"
         Then I get a response with a link to the "voicemails" resource using the id "voicemail_id"
         Then I get a response with a link to the "users" resource using the id "user_id"
@@ -60,7 +60,7 @@ Feature: Link a user and a voicemail
         When I link user "Harry Kim" with voicemail "1065@default" via RESTAPI
         Then I get a response with status "201"
         Then I get a response with a voicemail id
-        Then I get a response with a user id
+        Then I get a response with a user id via RESTAPI
         Then I get a header with a location matching "/1.1/users/\d+/voicemail"
         Then I get a response with a link to the "voicemails" resource using the id "voicemail_id"
         Then I get a response with a link to the "users" resource using the id "user_id"
@@ -88,7 +88,7 @@ Feature: Link a user and a voicemail
         When I request the voicemail associated to user "Kes" "Ocampan" via RESTAPI
         Then I get a response with status "200"
         Then I get a response with a voicemail id
-        Then I get a response with a user id
+        Then I get a response with a user id via RESTAPI
         Then I get a response with a link to the "voicemails" resource using the id "voicemail_id"
         Then I get a response with a link to the "users" resource using the id "user_id"
 

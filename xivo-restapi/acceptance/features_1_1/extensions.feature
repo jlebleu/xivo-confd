@@ -32,7 +32,7 @@ Feature: REST API Extensions
         Then I get an empty list
 
     Scenario: User link list by extension_id with 1 user
-        Given I only have the following users:
+        Given there are users with infos:
             |     id | firstname | lastname  |
             | 995476 | Greg      | Sanderson |
         Given I only have the following lines:
@@ -51,7 +51,7 @@ Feature: REST API Extensions
             |  995476 |  124689 |       995473 |
 
     Scenario: User link list by extension_id with 2 users
-        Given I only have the following users:
+        Given there are users with infos:
             |     id | firstname | lastname  |
             | 132449 | Greg      | Sanderson |
             | 995441 | Cedric    | Abunar    |
@@ -359,7 +359,7 @@ Feature: REST API Extensions
         Then the extension "954147" no longer exists
 
     Scenario: Delete an extension still has a link
-        Given I only have the following users:
+        Given there are users with infos:
             |     id | firstname | lastname |
             | 954471 | Clémence  | Dupond   |
         Given I only have the following lines:
