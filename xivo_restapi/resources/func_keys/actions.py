@@ -13,15 +13,9 @@ from xivo_dao.data_handler.func_key import services as func_key_services
 logger = logging.getLogger(__name__)
 formatter = Formatter(mapper, serializer, FuncKey)
 
-order_mapping = {
-    'id': FuncKeyOrder.id,
-    'type': FuncKeyOrder.type,
-    'destination': FuncKeyOrder.destination,
-}
-
 
 def list():
-    find_parameters = extract_find_parameters(order_mapping)
+    find_parameters = extract_find_parameters(FuncKeyOrder.mapping())
     search_result = func_key_services.search(**find_parameters)
     result = formatter.list_to_api(search_result.items, search_result.total)
     return make_response(result, 200)

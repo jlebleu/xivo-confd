@@ -37,15 +37,6 @@ blueprint = Blueprint('devices', __name__, url_prefix='/%s/devices' % config.VER
 route = RouteGenerator(blueprint)
 formatter = Formatter(mapper, serializer, Device)
 
-order_mapping = {
-    'ip': DeviceOrdering.ip,
-    'mac': DeviceOrdering.mac,
-    'plugin': DeviceOrdering.plugin,
-    'model': DeviceOrdering.model,
-    'vendor': DeviceOrdering.vendor,
-    'version': DeviceOrdering.version,
-}
-
 
 @route('/<deviceid>')
 def get(deviceid):
@@ -56,7 +47,7 @@ def get(deviceid):
 
 @route('')
 def list():
-    find_parameters = extract_find_parameters(order_mapping)
+    find_parameters = extract_find_parameters(DeviceOrdering.mapping())
     search_result = device_services.find_all(**find_parameters)
     result = formatter.list_to_api(search_result.items, search_result.total)
     return make_response(result, 200)
