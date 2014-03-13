@@ -33,6 +33,8 @@ from xivo_dao.data_handler.exception import ElementCreationError
 from xivo_dao.data_handler.exception import ElementEditionError
 from xivo_dao.data_handler.exception import ElementDeletionError
 from xivo_dao.data_handler.exception import AssociationNotExistsError
+from xivo_dao.data_handler.exception import InputError
+from xivo_dao.data_handler.exception import DataError
 
 
 class TestCommon(unittest.TestCase):
@@ -99,6 +101,30 @@ class TestCommon(unittest.TestCase):
 
         def function():
             raise Exception("error message")
+
+        decorated_function = exception_catcher(function)
+
+        response = decorated_function()
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_exception_catcher_input_error(self):
+        expected_status_code = 400
+        expected_message = ['']
+
+        def function():
+            raise InputError()
+
+        decorated_function = exception_catcher(function)
+
+        response = decorated_function()
+        self.assertResponse(response, expected_status_code, expected_message)
+
+    def test_exception_catcher_data_error(self):
+        expected_status_code = 400
+        expected_message = ['']
+
+        def function():
+            raise DataError()
 
         decorated_function = exception_catcher(function)
 

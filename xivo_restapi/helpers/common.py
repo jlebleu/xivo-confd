@@ -30,6 +30,7 @@ from xivo_dao.data_handler.exception import ElementCreationError
 from xivo_dao.data_handler.exception import ElementEditionError
 from xivo_dao.data_handler.exception import ElementDeletionError
 from xivo_dao.data_handler.exception import AssociationNotExistsError
+from xivo_dao.data_handler.exception import InputError, DataError
 
 from xivo_restapi.helpers import serializer
 from flask.globals import request
@@ -41,7 +42,9 @@ logger = logging.getLogger(__name__)
 def exception_catcher(func):
     @wraps(func)
     def decorated_func(*args, **kwargs):
-        generic_errors = (MissingParametersError,
+        generic_errors = (InputError,
+                          DataError,
+                          MissingParametersError,
                           InvalidParametersError,
                           NonexistentParametersError,
                           ElementAlreadyExistsError,
