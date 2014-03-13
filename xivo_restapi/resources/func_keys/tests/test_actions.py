@@ -18,7 +18,7 @@ import unittest
 
 from xivo_restapi.resources.func_keys import actions
 from xivo_dao.helpers.abstract_model import SearchResult
-from xivo_dao.data_handler.func_key.model import FuncKey
+from xivo_dao.data_handler.func_key.model import FuncKey, FuncKeyOrder
 from mock import patch, Mock
 from hamcrest import assert_that, equal_to
 
@@ -37,7 +37,7 @@ class TestFuncKeyActions(unittest.TestCase):
 
         result = actions.list()
 
-        extract_find_parameters.assert_called_once_with(actions.order_mapping)
+        extract_find_parameters.assert_called_once_with(FuncKeyOrder.mapping())
         func_key_search.assert_called_once_with(**find_parameters)
         list_to_api.assert_called_once_with(search_result.items, search_result.total)
         make_response.assert_called_once_with(formatted_list, 200)

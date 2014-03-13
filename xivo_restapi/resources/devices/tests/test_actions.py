@@ -171,14 +171,7 @@ class TestDeviceActions(TestResources):
         query_url = "search=search&skip=1&limit=2&order=ip&direction=asc"
         result = self.app.get("%s?%s" % (BASE_URL, query_url))
 
-        extract_find_parameters.assert_called_once_with({
-            'ip': DeviceOrdering.ip,
-            'mac': DeviceOrdering.mac,
-            'plugin': DeviceOrdering.plugin,
-            'model': DeviceOrdering.model,
-            'vendor': DeviceOrdering.vendor,
-            'version': DeviceOrdering.version,
-        })
+        extract_find_parameters.assert_called_once_with(DeviceOrdering.mapping())
 
         device_find_all.assert_called_once_with(**find_parameters)
         assert_that(result.status_code, equal_to(expected_status_code))

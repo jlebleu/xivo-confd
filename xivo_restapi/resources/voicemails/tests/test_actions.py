@@ -175,14 +175,7 @@ class TestVoicemailsAction(TestResources):
 
         result = self.app.get("%s?%s" % (BASE_URL, query_string))
 
-        extract_find_parameters.assert_called_once_with({
-            'name': VoicemailOrder.name,
-            'number': VoicemailOrder.number,
-            'context': VoicemailOrder.context,
-            'email': VoicemailOrder.email,
-            'language': VoicemailOrder.language,
-            'timezone': VoicemailOrder.timezone
-        })
+        extract_find_parameters.assert_called_once_with(VoicemailOrder.mapping())
         voicemail_find_all.assert_called_once_with(**request_parameters)
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))

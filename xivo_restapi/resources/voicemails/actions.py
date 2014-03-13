@@ -37,19 +37,10 @@ blueprint = Blueprint('voicemails', __name__, url_prefix='/%s/voicemails' % conf
 route = RouteGenerator(blueprint)
 formatter = Formatter(mapper, serializer, Voicemail)
 
-order_mapping = {
-    'name': VoicemailOrder.name,
-    'number': VoicemailOrder.number,
-    'context': VoicemailOrder.context,
-    'email': VoicemailOrder.email,
-    'language': VoicemailOrder.language,
-    'timezone': VoicemailOrder.timezone
-}
-
 
 @route('')
 def list():
-    find_parameters = extract_find_parameters(order_mapping)
+    find_parameters = extract_find_parameters(VoicemailOrder.mapping())
     search_result = voicemail_services.find_all(**find_parameters)
     result = formatter.list_to_api(search_result.items, search_result.total)
     return make_response(result, 200)
