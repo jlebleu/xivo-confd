@@ -38,21 +38,21 @@ Feature: REST API Extensions
     Scenario: Creating an empty extension
         When I create an empty extension
         Then I get a response with status "400"
-        Then I get an error message "Missing parameters: exten,context"
+        Then I get an error message "Missing parameters: exten, context"
 
     Scenario: Creating an extension with an empty number
         When I create an extension with the following parameters:
             | exten | context |
             |       | default |
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: Exten required"
+        Then I get an error message "Missing parameters: exten"
 
     Scenario: Creating an extension with an empty context
         When I create an extension with the following parameters:
             | exten | context |
             | 1000  |         |
         Then I get a response with status "400"
-        Then I get an error message "Invalid parameters: Context required"
+        Then I get an error message "Missing parameters: context"
 
     Scenario: Creating an extension with only the number
         When I create an extension with the following parameters:
@@ -162,7 +162,7 @@ Feature: REST API Extensions
             | exten | context |
             | 1454  | default |
         Then I get a response with status "400"
-        Then I get an error message "Extension 1454@default already exists"
+        Then I get an error message "Duplicate resource: Extension already exists (exten=1454, context=default)"
 
     Scenario: Creating two extensions in different contexts
         Given I have no extension with exten "1119@default"
@@ -181,7 +181,7 @@ Feature: REST API Extensions
             | exten | context             |
             | 1000  | mysuperdupercontext |
         Then I get a response with status "400"
-        Then I get an error message "Nonexistent parameters: context mysuperdupercontext does not exist"
+        Then I get an error message "Resource not found: Context (name=mysuperdupercontext) does not exist"
 
     Scenario: Creating an extension outside of context range
         When I create an extension with the following parameters:
@@ -254,7 +254,7 @@ Feature: REST API Extensions
           | context             |
           | mysuperdupercontext |
         Then I get a response with status "400"
-        Then I get an error message "Nonexistent parameters: context mysuperdupercontext does not exist"
+        Then I get an error message "Resource not found: Context (name=mysuperdupercontext) does not exist"
 
     Scenario: Editing the exten, context of a extension
         Given I have the following extensions:
@@ -308,4 +308,4 @@ Feature: REST API Extensions
         Given line "299568" is linked with extension "1226@default"
         When I delete extension "328785"
         Then I get a response with status "400"
-        Then I get an error message "Error while deleting Extension: extension still has a link"
+        Then I get an error message "Extension is still associated to the resource 'Line' (id=299568)"
