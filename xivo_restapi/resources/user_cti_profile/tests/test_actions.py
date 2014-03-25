@@ -44,8 +44,8 @@ class TestUserVoicemailActions(TestResources):
 
         assert_that(result.status_code, equal_to(expected_status_code))
 
-    @patch('xivo_dao.data_handler.user_cti_profile.services.get')
-    def test_get_cti_configuration(self, user_cti_profile_get):
+    @patch('xivo_dao.data_handler.user_cti_profile.services.get_by_user_id')
+    def test_get_cti_configuration(self, get_by_user_id):
         user_id = 1
         cti_profile_id = 2
 
@@ -67,15 +67,15 @@ class TestUserVoicemailActions(TestResources):
         }
 
         user_cti_profile = UserCtiProfile(user_id=user_id, cti_profile_id=cti_profile_id, enabled=True)
-        user_cti_profile_get.return_value = user_cti_profile
+        get_by_user_id.return_value = user_cti_profile
 
         result = self.app.get(BASE_URL % user_id)
 
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
-    @patch('xivo_dao.data_handler.user_cti_profile.services.get')
-    def test_get_cti_profile_association_not_exists(self, user_cti_profile_get):
+    @patch('xivo_dao.data_handler.user_cti_profile.services.get_by_user_id')
+    def test_get_cti_profile_association_not_exists(self, get_by_user_id):
         user_id = 1
 
         expected_status_code = 200
@@ -92,21 +92,21 @@ class TestUserVoicemailActions(TestResources):
         }
 
         user_cti_profile = UserCtiProfile(user_id=user_id, cti_profile_id=None, enabled=False)
-        user_cti_profile_get.return_value = user_cti_profile
+        get_by_user_id.return_value = user_cti_profile
 
         result = self.app.get(BASE_URL % user_id)
 
         assert_that(result.status_code, equal_to(expected_status_code))
         assert_that(self._serialize_decode(result.data), equal_to(expected_result))
 
-    @patch('xivo_dao.data_handler.user_cti_profile.services.get')
-    def test_get_cti_profile_association_unexisting_user(self, user_cti_profile_get):
+    @patch('xivo_dao.data_handler.user_cti_profile.services.get_by_user_id')
+    def test_get_cti_profile_association_unexisting_user(self, get_by_user_id):
         user_id = 1
 
         expected_status_code = 404
         expected_result = ['user with id=%d does not exist' % user_id]
 
-        user_cti_profile_get.side_effect = ElementNotExistsError('user', id=user_id)
+        get_by_user_id.side_effect = ElementNotExistsError('user', id=user_id)
 
         result = self.app.get(BASE_URL % user_id)
 

@@ -28,14 +28,14 @@ formatter = UserCtiProfileFormatter()
 @route('/<int:userid>/cti', methods=['PUT'])
 def edit_cti_configuration(userid):
     data = request.data.decode("utf-8")
-    model = formatter.to_model(data, userid)
+    model = user_cti_profile_services.get_by_user_id(userid)
+    formatter.update_model(model, data)
     user_cti_profile_services.edit(model)
-
     return make_response('', 204)
 
 
 @route('/<int:userid>/cti', methods=['GET'])
 def get_cti_configuration(userid):
-    model = user_cti_profile_services.get(userid)
+    model = user_cti_profile_services.get_by_user_id(userid)
     result = formatter.to_api(model)
     return make_response(result, 200)
