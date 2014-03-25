@@ -181,7 +181,7 @@ Feature: REST API Extensions
             | exten | context             |
             | 1000  | mysuperdupercontext |
         Then I get a response with status "400"
-        Then I get an error message "Resource not found: Context (name=mysuperdupercontext) does not exist"
+        Then I get an error message "Resource not found: Context does not exist (name=mysuperdupercontext)"
 
     Scenario: Creating an extension outside of context range
         When I create an extension with the following parameters:
@@ -254,7 +254,7 @@ Feature: REST API Extensions
           | context             |
           | mysuperdupercontext |
         Then I get a response with status "400"
-        Then I get an error message "Resource not found: Context (name=mysuperdupercontext) does not exist"
+        Then I get an error message "Resource not found: Context does not exist (name=mysuperdupercontext)"
 
     Scenario: Editing the exten, context of a extension
         Given I have the following extensions:
@@ -308,4 +308,4 @@ Feature: REST API Extensions
         Given line "299568" is linked with extension "1226@default"
         When I delete extension "328785"
         Then I get a response with status "400"
-        Then I get an error message "Extension is still associated to the resource 'Line' (id=299568)"
+        Then I get an error message "Association error: Extension is still associated to the resource 'Line' (id=299568)"
