@@ -24,16 +24,6 @@ Feature: REST API CTI Profiles
         When I ask for the CTI profile with id "215"
         Then I get a response with status "404"
 
-    Scenario: Associate CTI profile to user
-        Given there are users with infos:
-            | firstname | lastname |
-            |  Genviève |    Camus |
-        Given I have the following CTI profiles:
-            |  id |     name  |
-            | 113 | Profil 02 |
-        When I associate CTI profile "113" with user "Genviève" "Camus"
-        Then I get a response with status "204"
-
     Scenario: Get CTI configuration of a user
         Given there are users with infos:
             | firstname | lastname |
@@ -42,8 +32,8 @@ Feature: REST API CTI Profiles
             |  id |      name |
             | 112 | Profil 01 |
         Given the following users, CTI profiles are linked:
-            | firstname | lastname | cti_profile_id |
-            | Eric      | Lerouge  |            112 |
+            | firstname | lastname | cti_profile_id | enabled |
+            | Eric      | Lerouge  |            112 | true    |
         When I send request for the CTI configuration of the user "Eric" "Lerouge"
         Then I get a response with status "200"
         Then I get a response with a link to the "users" resource using the id "user_id"
@@ -54,8 +44,17 @@ Feature: REST API CTI Profiles
             | firstname | lastname |
             |    Marcel |     Aymé |
         When I send request for the CTI configuration of the user "Marcel" "Aymé"
-        Then I get a response with status "200"
-        Then I get a response with a null CTI profile
+        Then I get a response with status "404"
+
+    Scenario: Associate CTI profile to user
+        Given there are users with infos:
+            | firstname | lastname |
+            |  Genviève |    Camus |
+        Given I have the following CTI profiles:
+            |  id |     name  |
+            | 113 | Profil 02 |
+        When I associate CTI profile "113" with user "Genviève" "Camus"
+        Then I get a response with status "204"
 
     Scenario: Associate a user to a CTI profile which does not exist
         Given there are users with infos:
@@ -64,7 +63,7 @@ Feature: REST API CTI Profiles
         Given there is no CTI profile with id "117"
         When I associate CTI profile "117" with user "Cécile" "Durand"
         Then I get a response with status "400"
-        Then I get an error message "Nonexistent parameters: cti_profile 117 does not exist"
+        Then I get an error message "Resource not found: CtiProfile (id=117) does not exist"
 
     Scenario: XiVO Client connection after associating a profile
         Given there are users with infos:
@@ -82,7 +81,11 @@ Feature: REST API CTI Profiles
         Given there are users with infos:
             | firstname | lastname |
             |      René |   Albert |
+        Given I have the following CTI profiles:
+            |  id |     name  |
+            | 120 | Profil 03 |
+        When I associate CTI profile "120" with user "René" "Albert"
+
         When I enable the CTI client for the user "René" "Albert"
         Then I get a response with status "400"
         Then I get an error message matching "Error while editing \d+: the user must have a username and password to enable the CTI"
-
