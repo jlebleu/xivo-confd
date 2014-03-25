@@ -71,7 +71,7 @@ Feature: REST API Devices
             | ip       | mac               |
             | 10.0.0.3 | 00:11:22:33:44:52 |
         Then I get a response with status "400"
-        Then I get an error message "device 00:11:22:33:44:52 already exists"
+        Then I get an error message "Duplicate resource: Device already exists (mac=00:11:22:33:44:52)"
 
     Scenario: Create 2 devices with the same ip address
         Given there are no devices with mac "00:11:22:33:44:53"
@@ -91,7 +91,7 @@ Feature: REST API Devices
             | ip       | mac               | plugin                   |
             | 10.0.0.5 | 00:11:22:33:44:55 | mysuperduperplugin-1.2.3 |
         Then I get a response with status "400"
-        Then I get an error message "Nonexistent parameters: plugin mysuperduperplugin-1.2.3 does not exist"
+        Then I get an error message "Resource not found: Plugin does not exist (plugin=mysuperduperplugin-1.2.3)"
 
     Scenario: Create a device with a plugin
         Given there are no devices with mac "00:11:22:33:44:56"
@@ -110,7 +110,7 @@ Feature: REST API Devices
     Scenario: Create a device with a config template that doesn't exist
         When I create a device using the device template id "mysuperduperdevicetemplate"
         Then I get a response with status "400"
-        Then I get an error message "Nonexistent parameters: template_id mysuperduperdevicetemplate does not exist"
+        Then I get an error message "Resource not found: DeviceTemplate does not exist (template_id=mysuperduperdevicetemplate)"
 
     Scenario: Create a device with a config template
         Given there exists the following device templates:
@@ -220,7 +220,7 @@ Feature: REST API Devices
             | mac               |
             | 00:11:22:33:44:56 |
         Then I get a response with status "400"
-        Then I get an error message "device 00:11:22:33:44:56 already exists"
+        Then I get an error message "Duplicate resource: Device already exists (mac=00:11:22:33:44:56)"
 
     Scenario: Edit a device with an invalid ip
         Given I have the following devices:
@@ -245,7 +245,7 @@ Feature: REST API Devices
             | template_id          |
             | mysuperdupertemplate |
         Then I get a response with status "400"
-        Then I get an error message "Nonexistent parameters: template_id mysuperdupertemplate does not exist"
+        Then I get an error message "Resource not found: DeviceTemplate does not exist (template_id=mysuperdupertemplate)"
 
     Scenario: Edit a device with a custom template
         Given there exists the following device templates:
@@ -273,7 +273,7 @@ Feature: REST API Devices
             | plugin          |
             | mysuperplugin   |
         Then I get a response with status "400"
-        Then I get an error message "Nonexistent parameters: plugin mysuperplugin does not exist"
+        Then I get an error message "Resource not found: Plugin does not exist (plugin=mysuperplugin)"
 
     Scenario: Edit a device with a plugin
         Given the plugin "null" is installed
@@ -477,4 +477,4 @@ Feature: REST API Devices
             | Aayla     | Secura   |   1234 | default | sip      | 00:00:00:00:00:12 |
         When I delete the device "6521879216879" from restapi
         Then I get a response with status "400"
-        Then I get an error message "Error while deleting device: device is still linked to a line"
+        Then I get an error message matching "Association error: Device is still associated to the resource 'Line' \(id=\d+\)"
