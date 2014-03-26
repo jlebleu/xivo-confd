@@ -16,7 +16,7 @@ Feature: REST API SIP Lines
     Scenario: Create an empty SIP line
         When I create an empty SIP line
         Then I get a response with status "400"
-        Then I get an error message "Missing parameters: context,device_slot"
+        Then I get an error message "Missing parameters: context, device_slot"
 
     Scenario: Create a line with an empty context
         When I create a line_sip with the following parameters:
@@ -211,4 +211,4 @@ Feature: REST API SIP Lines
         Given line "999514" is linked with extension "1000@default"
         When I delete line sip "999514"
         Then I get a response with status "400"
-        Then I get an error message "Error while deleting Line: line still has a link"
+        Then I get an error message "Association Error: Line is still associated to a resource"
