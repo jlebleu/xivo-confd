@@ -332,7 +332,7 @@ Feature: REST API Users
         Given line "546216" is linked with extension "1339@default"
         When I delete the user with id "956541"
         Then I get a response with status "400"
-        Then I get an error message "Error while deleting User: user still associated to a line"
+        Then I get an error message "Association error: User is still associated to the resource 'Line' (line_ids=546216)"
 
     Scenario: Deleting a user when still associated to a voicemail
         Given there are users with infos:
@@ -340,4 +340,4 @@ Feature: REST API Users
             | Ringo     | Sylla    | 1349   | default | sip      | Ringo Sylla    | 1349             |
         When I delete the user with name "Ringo" "Sylla"
         Then I get a response with status "400"
-        Then I get an error message "Error while deleting User: user still associated to a voicemail"
+        Then I get an error message matching "Association error: User is still associated to the resource 'Voicemail' \(id=\d+\)"
