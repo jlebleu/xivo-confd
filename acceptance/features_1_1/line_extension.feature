@@ -7,7 +7,7 @@ Feature: Link a line and an extension
             | 1500  | default |
         When I link extension "1500@default" with line id "138710"
         Then I get a response with status "400"
-        Then I get an error message "Nonexistent parameters: line_id 138710 does not exist"
+        Then I get an error message "Resource not found: Line does not exist (id=138710)"
 
     Scenario: Link a line with an extension that doesn't exist
         Given I have no extension with id "292333"
@@ -16,7 +16,7 @@ Feature: Link a line and an extension
             | 687078 | default | sip      | 1           |
         When I link extension id "292333" with line id "687078"
         Then I get a response with status "400"
-        Then I get an error message "Nonexistent parameters: extension_id 292333 does not exist"
+        Then I get an error message "Resource not found: Extension does not exist (id=292333)"
 
     Scenario: Link an extension with a SIP line without a user
         Given I have the following lines:
@@ -59,13 +59,13 @@ Feature: Link a line and an extension
         Then I get a response with status "201"
         When I link extension "1505@default" with line id "841902"
         Then I get a response with status "400"
-        Then I get an error message matching "Invalid parameters: line with id 841902 already has an extension"
+        Then I get an error message matching "Association error: Line is still associated to the resource 'Extension' \(line_id=\d+, extension_id=\d+\)"
 
     Scenario: Get the extension associated to a line that doesn't exist
         Given I have no line with id "300596"
         When I send a request for the extension associated to line id "300596"
         Then I get a response with status "404"
-        Then I get an error message "Line with line_id=300596 does not exist"
+        Then I get an error message "Resource not found: Line does not exist (id=300596)"
 
     Scenario: Get the extension associated to a line with no extensions
         Given I have the following lines:
@@ -73,7 +73,7 @@ Feature: Link a line and an extension
             | 211536 | default | sip      | 1           |
         When I send a request for the extension associated to line id "211536"
         Then I get a response with status "404"
-        Then I get an error message "Line with id=211536 does not have an extension"
+        Then I get an error message "Resource not found: LineExtension does not exist (line_id=211536)"
 
     Scenario: Get the extension associated to a line
         Given there are users with infos:
@@ -96,7 +96,7 @@ Feature: Link a line and an extension
         Given I have no line with id "188404"
         When I dissociate the extension associated to line id "188404"
         Then I get a response with status "404"
-        Then I get an error message "Line with line_id=188404 does not exist"
+        Then I get an error message "Resource not found: Line does not exist (id=188404)"
 
     Scenario: Dissociate an extension from a line that doesn't have one
         Given I have the following lines:
@@ -104,7 +104,7 @@ Feature: Link a line and an extension
             | 116775 | default | sip      | 1           |
         When I dissociate the extension associated to line id "116775"
         Then I get a response with status "404"
-        Then I get an error message "Line with id=116775 does not have an extension"
+        Then I get an error message "Resource not found: LineExtension does not exist (line_id=116775)"
 
     Scenario: Dissociate an extension from a line with a user
         Given there are users with infos:
