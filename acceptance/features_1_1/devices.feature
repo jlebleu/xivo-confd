@@ -143,13 +143,11 @@ Feature: REST API Devices
             | 10.0.0.1 | 00:11:22:33:44:55 | XX | null   | nullmodel | nullvendor | 1.0     | example     | {"switchboard": True} | mytemplate  |
 
     Scenario: Synchronize a device
-        Given there are no devices with id "123"
-        Given there are no devices with mac "00:00:00:00:aa:01"
         Given I have the following devices:
-          | id  | ip             | mac               |
-          | 123 | 192.168.32.197 | 00:00:00:00:aa:01 |
-        When I synchronize the device "123" from restapi
-        Then I see in the log file device "123" synchronized
+          | ip             | mac               |
+          | 192.168.32.197 | 00:00:00:00:aa:01 |
+        When I synchronize the device with mac "00:00:00:00:aa:01" from restapi
+        Then I see in the log file device with mac "00:00:00:00:aa:01" synchronized
 
     Scenario: Edit a device with no parameters
         Given I have the following devices:
@@ -428,22 +426,21 @@ Feature: REST API Devices
         Then I get a response with status "200"
 
     Scenario: Reset to autoprov a device
-        Given there are no devices with id "123"
-        Given there are no devices with mac "00:00:00:00:aa:01"
+        Given there are no devices with mac "00:00:00:00:aa:02"
         Given I have the following devices:
-          | id  | ip             | mac               |
-          | 123 | 192.168.32.197 | 00:00:00:00:aa:01 |
-        When I reset the device "123" to autoprov from restapi
-        Then I see in the log file device "123" autoprovisioned
+          | ip             | mac               |
+          | 192.168.32.197 | 00:00:00:00:aa:02 |
+        When I reset the device with mac "00:00:00:00:aa:02" to autoprov from restapi
+        Then I see in the log file device with mac "00:00:00:00:aa:02" autoprovisioned
 
     Scenario: Associate line to a device
         Given I have the following lines:
             |     id | context | protocol | username | secret | device_slot |
             | 523478 | default | sip      | toto     | tata   |           1 |
-        Given I only have the following devices:
-            |              id |       ip |               mac |
-            | 658743288432479 | 10.0.0.1 | 00:00:00:00:00:12 |
-        When I associate my line_id "523478" to the device "658743288432479"
+        Given I have the following devices:
+            | ip       | mac               |
+            | 10.0.0.1 | 00:00:00:00:00:12 |
+        When I associate my line_id "523478" to the device with mac "00:00:00:00:00:12"
         Then I get a response with status "403"
 
     Scenario: Remove line to a device
@@ -455,13 +452,14 @@ Feature: REST API Devices
         Then I get a response with status "403"
 
     Scenario: Delete a device
-        Given I only have the following devices:
-            |            id |       ip |               mac |
-            | 1346771446546 | 10.0.0.1 | 00:00:00:00:00:12 |
-        When I delete the device "1346771446546" from restapi
+        Given I have the following devices:
+            | ip       | mac               |
+            | 10.0.0.1 | 00:00:00:00:00:13 |
+        When I memorize the id for device with mac "00:00:00:00:00:13"
+        When I delete the device with mac "00:00:00:00:00:13" from restapi
         Then I get a response with status "204"
-        Then I see in the log file device "1346771446546" deleted
-        Then the device "1346771446546" is no longer exists in provd
+        Then I see in the log file that the memorized device id was deleted
+        Then the device with mac "00:00:00:00:00:12" no longer exists in provd
 
     Scenario: Delete a device that doesn't exist
         Given there are no devices with id "abcd"
@@ -470,11 +468,11 @@ Feature: REST API Devices
 
     Scenario: Delete a device associated to a line
         Given I have the following devices:
-            |            id |       ip |               mac |
-            | 6521879216879 | 10.0.0.1 | 00:00:00:00:00:12 |
+            |       ip |               mac |
+            | 10.0.0.1 | 00:00:00:00:00:13 |
         Given there are users with infos:
             | firstname | lastname | number | context | protocol |            device |
-            | Aayla     | Secura   |   1234 | default | sip      | 00:00:00:00:00:12 |
-        When I delete the device "6521879216879" from restapi
+            | Aayla     | Secura   |   1234 | default | sip      | 00:00:00:00:00:13 |
+        When I delete the device with mac "00:00:00:00:00:13" from restapi
         Then I get a response with status "400"
         Then I get an error message "Error while deleting device: device is still linked to a line"
