@@ -21,19 +21,20 @@ Feature: REST API Extensions
             | 1947  | default |
 
     Scenario: Get an extension that does not exist
-        Given I have no extension with id "699324"
-        When I access the extension with id "699324"
+        When I access a fake extension id
         Then I get a response with status "404"
 
     Scenario: Get an extension
         Given I have the following extensions:
-            | id     | exten | context |
-            | 447614 | 1599  | default |
-        When I access the extension with id "447614"
+            | exten | context |
+            | 1599  | default |
+        When I access the extension with exten "1599@default"
         Then I get a response with status "200"
         Then I have an extension with the following parameters:
-            | id     | exten | context |
-            | 447614 | 1599  | default |
+            | exten | context |
+            | 1599  | default |
+        Then I get a response with an id
+        Then I get a response with a link to the "extensions" resource
 
     Scenario: Creating an empty extension
         When I create an empty extension
@@ -191,121 +192,120 @@ Feature: REST API Extensions
         Then I get an error message "Invalid parameters: exten 99999 not inside range of context default"
 
     Scenario: Editing an extension that doesn't exist
-        Given I have no extension with id "9999"
-        When I update the extension with id "9999" using the following parameters:
-          | exten |
-          | 1001  |
+        When I update a fake extension
         Then I get a response with status "404"
 
     Scenario: Editing an extension with parameters that don't exist
         Given I have the following extensions:
-          | id     | exten | context |
-          | 449721 | 1358  | default |
-        When I update the extension with id "449721" using the following parameters:
+          | exten | context |
+          | 1358  | default |
+        When I update the extension with exten "1358@default" using the following parameters:
           | unexisting_field |
           | unexisting value |
         Then I get a response with status "400"
         Then I get an error message "Invalid parameters: unexisting_field"
 
     Scenario: Editing the exten of a extension
+        Given I have no extension with exten "1145@default"
         Given I have the following extensions:
-          | id     | exten | context |
-          | 113444 | 1045  | default |
-        When I update the extension with id "113444" using the following parameters:
+          | exten | context |
+          | 1045  | default |
+        When I update the extension with exten "1045@default" using the following parameters:
           | exten |
           | 1145  |
         Then I get a response with status "204"
-        When I access the extension with id "113444"
+        When I access the extension with exten "1145@default"
         Then I have an extension with the following parameters:
-          | id     | exten | context |
-          | 113444 | 1145  | default |
+          | exten | context |
+          | 1145  | default |
 
     Scenario: Editing an extension with an exten outside of context range
         Given I have the following extensions:
-          | id     | exten | context |
-          | 443166 | 1453  | default |
-        When I update the extension with id "443166" using the following parameters:
+          | exten | context |
+          | 1453  | default |
+        When I update the extension with exten "1453@default" using the following parameters:
           | exten |
           | 9999  |
       Then I get a response with status "400"
       Then I get an error message "Invalid parameters: exten 9999 not inside range of context default"
 
     Scenario: Editing the context of a extension
+        Given I have no extension with exten "1833@toto"
         Given I have the following extensions:
-          | id     | exten | context |
-          | 214489 | 1833  | default |
+          | exten | context |
+          | 1833  | default |
         Given I have the following context:
           | name | numberbeg | numberend |
           | toto | 1000      | 1999      |
-        When I update the extension with id "214489" using the following parameters:
+        When I update the extension with exten "1833@default" using the following parameters:
           | context |
           | toto    |
         Then I get a response with status "204"
-        When I access the extension with id "214489"
+        When I access the extension with exten "1833@toto"
         Then I have an extension with the following parameters:
-          | id     | exten | context |
-          | 214489 | 1833  | toto    |
+          | exten | context |
+          | 1833  | toto    |
 
     Scenario: Editing the extension with a context that doesn't exist
         Given I have the following extensions:
-          | id     | exten | context |
-          | 959476 | 1665  | default |
-        When I update the extension with id "959476" using the following parameters:
+          | exten | context |
+          | 1665  | default |
+        When I update the extension with exten "1665@default" using the following parameters:
           | context             |
           | mysuperdupercontext |
         Then I get a response with status "400"
         Then I get an error message "Nonexistent parameters: context mysuperdupercontext does not exist"
 
     Scenario: Editing the exten, context of a extension
+        Given I have no extension with exten "1996@patate"
         Given I have the following extensions:
-          | id     | exten | context |
-          | 113469 | 1292  | default |
+          | exten | context |
+          | 1292  | default |
         Given I have the following context:
           | name   | numberbeg | numberend |
           | patate | 1000      | 1999      |
-        When I update the extension with id "113469" using the following parameters:
+        When I update the extension with exten "1292@default" using the following parameters:
           | exten | context |
           | 1996  | patate  |
         Then I get a response with status "204"
-        When I access the extension with id "113469"
+        When I access the extension with exten "1996@patate"
         Then I have an extension with the following parameters:
-          | id     | exten | context |
-          | 113469 | 1996  | patate  |
+          | exten | context |
+          | 1996  | patate  |
 
     Scenario: Editing a commented extension
         Given I have the following extensions:
-          | id     | exten | context | commented |
-          | 962441 | 1107  | default | true      |
-        When I update the extension with id "962441" using the following parameters:
+          | exten | context | commented |
+          | 1107  | default | true      |
+        When I update the extension with exten "1107@default" using the following parameters:
           | commented |
           | false     |
         Then I get a response with status "204"
-        When I access the extension with id "962441"
+        When I access the extension with exten "1107@default"
         Then I have an extension with the following parameters:
-          | id     | exten | context | commented |
-          | 962441 | 1107  | default | false     |
+          | exten | context | commented |
+          | 1107  | default | false     |
 
     Scenario: Delete an extension that doesn't exist
-        Given I have no extension with id "892476"
-        When I delete extension "892476"
+        When I delete a fake extension
         Then I get a response with status "404"
 
     Scenario: Delete an extension
         Given I have the following extensions:
-            | id     | exten | context |
-            | 954147 | 1846  | default |
-        When I delete extension "954147"
+            | exten | context |
+            | 1846  | default |
+        When I delete extension with exten "1846@default"
         Then I get a response with status "204"
-        Then the extension "954147" no longer exists
+        Then the extension with exten "1846@default" no longer exists
 
     Scenario: Delete an extension associated to a line
         Given I have the following lines:
             | id     | context | protocol | device_slot |
             | 299568 | default | sip      | 1           |
         Given I have the following extensions:
-            | id     | exten | context |
-            | 328785 | 1226  | default |
+            | exten | context |
+            | 1226  | default |
         Given line "299568" is linked with extension "1226@default"
-        When I delete extension "328785"
+        When I delete extension with exten "1226@default"
         Then I get a response with status "400"
         Then I get an error message "Error while deleting Extension: extension still has a link"

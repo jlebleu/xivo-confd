@@ -10,13 +10,12 @@ Feature: Link a line and an extension
         Then I get an error message "Nonexistent parameters: line_id 138710 does not exist"
 
     Scenario: Link a line with an extension that doesn't exist
-        Given I have no extension with id "292333"
         Given I have the following lines:
             | id     | context | protocol | device_slot |
             | 687078 | default | sip      | 1           |
-        When I link extension id "292333" with line id "687078"
+        When I link a fake extension with line id "687078"
         Then I get a response with status "400"
-        Then I get an error message "Nonexistent parameters: extension_id 292333 does not exist"
+        Then I get an error message matching "Nonexistent parameters: extension_id \d+ does not exist"
 
     Scenario: Link an extension with a SIP line without a user
         Given I have the following lines:
