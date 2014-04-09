@@ -70,7 +70,7 @@ Feature: REST API CTI Profiles
         Given there are users with infos:
             | firstname |   lastname |
             |     Félix |     Lechat |
-        When I update user "Félix" "Lechat" with the following parameters:
+        When I update the user with name "Félix" "Lechat" using the following parameters:
             | username | password |
             |  flechat |     1234 |
         When I activate the CTI client for user "Félix" "Lechat"

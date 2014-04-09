@@ -118,36 +118,35 @@ Feature: REST API Users
           | Remy      | Licorne  |
 
     Scenario: Getting a user that doesn't exist
-        Given there are no users with id "309484"
-        When I ask for the user with id "309484"
+        When I ask for a fake user
         Then I get a response with status "404"
 
     Scenario: Getting a user that exists
         Given I have the following users:
-          | id     | firstname | lastname |
-          | 323450 | Irène     | Dupont   |
-        When I ask for the user with id "323450"
+          | firstname | lastname |
+          | Irène     | Dupont   |
+        When I ask for the user with name "Irène" "Dupont"
         Then I get a response with status "200"
         Then I get a user with the following parameters:
-          | id     | firstname | lastname | userfield |
-          | 323450 | Irène     | Dupont   |           |
+          | firstname | lastname | userfield |
+          | Irène     | Dupont   |           |
 
     Scenario: Getting a user with all available parameters:
         Given I have the following users:
-            | id     | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
-            | 766763 | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
-        When I ask for the user with id "766763"
+            | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
+            | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
+        When I ask for the user with name "James" "Hetfield"
         Then I get a response with status "200"
         Then I get a user with the following parameters:
-            | id     | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
-            | 766763 | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | "METAL"   | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
+            | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
+            | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | "METAL"   | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
 
     Scenario: Creating an empty user
         When I create an empty user
         Then I get a response with status "400"
         Then I get an error message "Missing parameters: firstname"
 
-    Scenario: Creating a user with paramters that don't exist
+    Scenario: Creating a user with parameters that don't exist
         When I create users with the following parameters:
           | unexisting_field |
           | unexisting_value |
@@ -200,28 +199,25 @@ Feature: REST API Users
 
     Scenario: Creating a user with all available parameters
         When I create users with the following parameters:
-            | id     | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
-            | 156736 | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
+            | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
+            | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
         Then I get a response with status "201"
         Then I get a response with an id
         Then I get a header with a location for the "users" resource
         Then I get a response with a link to the "users" resource
         Then the created user has the following parameters:
-            | id     | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
-            | 156736 | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | "METAL"   | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
+            | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
+            | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | "METAL"   | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
 
     Scenario: Editing a user that doesn't exist
-        Given there are no users with id "444257"
-        When I update the user with id "444257" using the following parameters:
-          | firstname |
-          | Bob       |
+        When I update a fake user
         Then I get a response with status "404"
 
     Scenario: Editing a user with parameters that don't exist
         Given I have the following users:
-          | id     | firstname | lastname |
-          | 995435 | Clémence  | Dupond   |
-        When I update the user with id "995435" using the following parameters:
+          | firstname | lastname |
+          | Clémence  | Dupond   |
+        When I update the user with name "Clémence" "Dupond" using the following parameters:
           | unexisting_field |
           | unexisting value |
         Then I get a response with status "400"
@@ -229,35 +225,35 @@ Feature: REST API Users
 
     Scenario: Editing the firstname of a user
         Given I have the following users:
-          | id     | firstname | lastname |
-          | 995414 | Clémence  | Dupond   |
-        When I update the user with id "995414" using the following parameters:
+          | firstname | lastname |
+          | Clémence  | Dupond   |
+        When I update the user with name "Clémence" "Dupond" using the following parameters:
           | firstname |
           | Brézé     |
         Then I get a response with status "204"
-        When I ask for the user with id "995414"
+        When I ask for the user with name "Brézé" "Dupond"
         Then I get a user with the following parameters:
-          | id     | firstname | lastname | userfield | caller_id      |
-          | 995414 | Brézé     | Dupond   |           | "Brézé Dupond" |
+          | firstname | lastname | userfield | caller_id      |
+          | Brézé     | Dupond   |           | "Brézé Dupond" |
 
     Scenario: Editing the lastname of a user
         Given I have the following users:
-          | id     | firstname | lastname |
-          | 924465 | Clémence  | Dupond   |
-        When I update the user with id "924465" using the following parameters:
+          | firstname | lastname |
+          | Clémence  | Dupond   |
+        When I update the user with name "Clémence" "Dupond" using the following parameters:
           | lastname      |
           | Argentine     |
         Then I get a response with status "204"
-        When I ask for the user with id "924465"
+        When I ask for the user with name "Clémence" "Argentine"
         Then I get a user with the following parameters:
-          | id     | firstname | lastname  | userfield | caller_id            |
-          | 924465 | Clémence  | Argentine |           | "Clémence Argentine" |
+          | firstname | lastname  | userfield | caller_id            |
+          | Clémence  | Argentine |           | "Clémence Argentine" |
 
     Scenario: Editing a user associated with a voicemail
         Given there are users with infos:
             | firstname | lastname  | number | context | protocol | voicemail_name     | voicemail_number |
             | Francois  | Andouille | 1100   | default | sip      | Francois Andouille | 1100             |
-        When I update user "Francois" "Andouille" with the following parameters:
+        When I update the user with name "Francois" "Andouille" using the following parameters:
             | firstname | lastname |
             | Pizza     | Poulet   |
         Then I get a response with status "204"
@@ -268,69 +264,68 @@ Feature: REST API Users
 
     Scenario: Editing the firstname, lastname and caller_id of a user
         Given I have the following users:
-            | id     | firstname | lastname |
-            | 726313 | Clémence  | Dujas    |
-        When I update the user with id "726313" using the following parameters:
+            | firstname | lastname |
+            | Clémence  | Dujas    |
+        When I update the user with name "Clémence" "Dujas" using the following parameters:
             | firstname | lastname       | caller_id         |
             | Olivia    | Schtroumpfette | La Schtroumpfette |
         Then I get a response with status "204"
-        When I ask for the user with id "726313"
+        When I ask for the user with name "Olivia" "Schtroumpfette"
         Then I get a user with the following parameters:
-            | id     | firstname | lastname       | caller_id           |
-            | 726313 | Olivia    | Schtroumpfette | "La Schtroumpfette" |
+            | firstname | lastname       | caller_id           |
+            | Olivia    | Schtroumpfette | "La Schtroumpfette" |
 
     Scenario: Editing only the caller_id of a user
         Given I have the following users:
-            | id     | firstname | lastname |
-            | 447520 | Benoit    | Thierri  |
-        When I update the user with id "447520" using the following parameters:
+            | firstname | lastname |
+            | Benoit    | Thierri  |
+        When I update the user with name "Benoit" "Thierri" using the following parameters:
             | caller_id        |
             | Grand Schtroumpf |
         Then I get a response with status "204"
-        When I ask for the user with id "447520"
+        When I ask for the user with name "Benoit" "Thierri"
         Then I get a user with the following parameters:
-            | id     | firstname | lastname | caller_id          |
-            | 447520 | Benoit    | Thierri  | "Grand Schtroumpf" |
+            | firstname | lastname | caller_id          |
+            | Benoit    | Thierri  | "Grand Schtroumpf" |
 
     Scenario: Editing all available parameters of a user
         Given I have the following users:
-            | id     | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
-            | 140270 | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
-        When I update the user with id "140270" using the following parameters:
+            | firstname | lastname | timezone         | language | description        | caller_id | outgoing_caller_id | mobile_phone_number | username | password | music_on_hold | preprocess_subroutine | userfield |
+            | James     | Hetfield | America/Montreal | en_US    | Metallica Musician | METAL     | anonymous          | 5551234567          | james    | hetfield | missing       | subroutine            | userfield |
+        When I update the user with name "James" "Hetfield" using the following parameters:
             | firstname | lastname | timezone       | language | description | caller_id | outgoing_caller_id | mobile_phone_number | username  | password | music_on_hold | preprocess_subroutine | userfield |
             | Alexander | Powell   | Africa/Abidjan | fr_FR    | updated     | ALEXANDER | default            | 1234567890          | alexander | powell   | default       | other_subroutine      | myvalue   |
         Then I get a response with status "204"
-        When I ask for the user with id "140270"
+        When I ask for the user with name "Alexander" "Powell"
         Then I get a user with the following parameters:
-            | id     | firstname | lastname | timezone       | language | description | caller_id   | outgoing_caller_id | mobile_phone_number | username  | password | music_on_hold | preprocess_subroutine | userfield |
-            | 140270 | Alexander | Powell   | Africa/Abidjan | fr_FR    | updated     | "ALEXANDER" | default            | 1234567890          | alexander | powell   | default       | other_subroutine      | myvalue   |
+            | firstname | lastname | timezone       | language | description | caller_id   | outgoing_caller_id | mobile_phone_number | username  | password | music_on_hold | preprocess_subroutine | userfield |
+            | Alexander | Powell   | Africa/Abidjan | fr_FR    | updated     | "ALEXANDER" | default            | 1234567890          | alexander | powell   | default       | other_subroutine      | myvalue   |
 
     Scenario: Deleting a user that doesn't exist
-        Given there are no users with id "869049"
-        When I delete the user with id "869049"
+        When I delete a fake user
         Then I get a response with status "404"
 
     Scenario: Deleting a user
         Given I have the following users:
-          | id     | firstname | lastname |
-          | 955135 | Clémence  | Dupond   |
-        When I delete the user with id "955135"
+          | firstname | lastname |
+          | Clémence  | Dupond   |
+        When I delete the user with name "Clémence" "Dupond"
         Then I get a response with status "204"
-        Then the user with id "955135" no longer exists
+        Then the user with name "Clémence" "Dupond" no longer exists
 
     Scenario: Deleting a user when still associated to a line and extension
         Given I have the following users:
-            | id     | firstname | lastname |
-            | 956541 | Roberto   | Stanzini |
+            | firstname | lastname |
+            | Roberto   | Stanzini |
         Given I have the following lines:
             | id     | context | protocol | device_slot |
             | 546216 | default | sip      | 1           |
         Given I have the following extensions:
-            | id     | context | exten |
-            | 951654 | default | 1339  |
-        Given line "546216" is linked with user id "956541"
+            | context | exten |
+            | default | 1339  |
+        Given line "546216" is linked with user "Roberto" "Stanzini"
         Given line "546216" is linked with extension "1339@default"
-        When I delete the user with id "956541"
+        When I delete the user with name "Roberto" "Stanzini"
         Then I get a response with status "400"
         Then I get an error message "Error while deleting User: user still associated to a line"
 
