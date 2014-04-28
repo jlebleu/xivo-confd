@@ -41,7 +41,7 @@ formatter = Formatter(mapper, serializer, Voicemail)
 @route('')
 def list():
     find_parameters = extract_find_parameters(VoicemailOrder.mapping())
-    search_result = voicemail_services.find_all(**find_parameters)
+    search_result = voicemail_services.search(**find_parameters)
     result = formatter.list_to_api(search_result.items, search_result.total)
     return make_response(result, 200)
 
