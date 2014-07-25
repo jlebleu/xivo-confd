@@ -1,5 +1,5 @@
 from test_api import scenarios as s
-from test_api import client
+from test_api import helpers
 
 
 REQUIRED = ['exten', 'context']
@@ -17,6 +17,5 @@ class TestExtensionResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, 
     bogus_fields = BOGUS
 
     def create_url(self):
-        response = client.post("/extensions", {'context': 'default', 'exten': '1444'})
-        response.assert_status(201)
-        return "/extensions/{}".format(response.json['id'])
+        extension = helpers.extension.generate_extension()
+        return "/extensions/{}".format(extension['id'])
