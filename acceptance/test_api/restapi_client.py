@@ -1,7 +1,7 @@
 import requests
 import logging
 import json
-from hamcrest import assert_that, is_in
+from hamcrest import assert_that, is_in, has_key
 
 logger = logging.getLogger(__name__)
 
@@ -82,3 +82,12 @@ class Response(object):
     def content(self):
         self.assert_status(200, 201, 204)
         return self.json
+
+    @property
+    def item(self):
+        return self.content
+
+    @property
+    def items(self):
+        assert_that(self.content, has_key('items'))
+        return self.content['items']
