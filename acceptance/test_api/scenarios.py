@@ -1,97 +1,79 @@
+from contextlib import contextmanager
+
 from test_api import client
 import assertions as a
 
 
-class TestContext(object):
+class Scenarios(object):
 
-    def __init__(self, setup, teardown=None):
-        self.setup = setup
-        self.teardown = teardown
+    resource = None
+    required = []
+    bogus_fields = []
 
-    def __enter__(self):
-        self.url = self.setup()
-        return self.url
+    @contextmanager
+    def url_for_test(self):
+        url = self.create_url()
+        yield url
+        self.delete_url(url)
 
-    def __exit__(self, *args):
-        if self.teardown:
-            self.teardown(self.url)
+    def delete_url(self, url):
+        client.delete(url)
 
 
-class GetErrors(object):
+class GetScenarios(Scenarios):
 
-    def __init__(self, resource, setup, teardown):
-        self.resource = resource
-        self.setup = setup
-        self.teardown = teardown
-
-    def run(self):
-        url = self.setup()
-        self.teardown(url)
+    def test_resource_does_not_exist_on_get(self):
+        url = self.create_url()
+        self.delete_url(url)
 
         response = client.get(url)
         a.assert_not_exists(response, self.resource)
 
 
-class CreateErrors(object):
+class CreateScenarios(Scenarios):
 
-    def __init__(self, url, required=None, bogus_fields=None):
-        self.url = url
-        self.required = required or []
-        self.bogus_fields = bogus_fields or []
-
-    def run(self):
-        self.check_missing()
-        self.check_invalid()
-        self.check_wrong_type()
-
-    def check_missing(self):
+    def test_missing_parameter(self):
         for field in self.required:
             response = client.post(self.url, {})
-            a.assert_missing_parameter(response, field)
+            yield a.assert_missing_parameter, response, field
 
-    def check_invalid(self):
+    def test_invalid_parameter_on_post(self):
         response = client.post(self.url, {'invalid': 'invalid'})
         a.assert_invalid_parameter(response, 'invalid')
 
-    def check_wrong_type(self):
-        for field, value, message in self.bogus_fields:
-            response = client.post(self.url, {field: value})
-            a.assert_field_validation(response, field, message)
+    def test_wrong_parameter_type_on_post(self):
+        for bogus_field in self.bogus_fields:
+            yield self.check_bogus_field_on_post, bogus_field
+
+    def check_bogus_field_on_post(self, bogus_field):
+        field, value, message = bogus_field
+        response = client.post(self.url, {field: value})
+        a.assert_field_validation(response, field, message)
 
 
-class EditErrors(object):
+class EditScenarios(Scenarios):
 
-    def __init__(self, setup, teardown, bogus_fields=None):
-        self.setup = setup
-        self.test_context = TestContext(setup, teardown)
-        self.bogus_fields = bogus_fields or []
-
-    def run(self):
-        self.check_invalid()
-        self.check_wrong_type()
-
-    def check_invalid(self):
-        with self.test_context as url:
+    def test_invalid_parameter_on_put(self):
+        with self.url_for_test() as url:
             response = client.put(url, {'invalid': 'invalid'})
             a.assert_invalid_parameter(response, 'invalid')
 
-    def check_wrong_type(self):
-        with self.test_context as url:
-            for field, value, message in self.bogus_fields:
-                response = client.put(url, {field: value})
-                a.assert_field_validation(response, field, message)
+    def test_wrong_parameter_type_on_put(self):
+        with self.url_for_test() as url:
+            for bogus_field in self.bogus_fields:
+                yield self.check_bogus_field_on_put, url, bogus_field
+
+    def check_bogus_field_on_put(self, url, bogus_field):
+        field, value, message = bogus_field
+        response = client.put(url, {field: value})
+        a.assert_field_validation(response, field, message)
 
 
-class DeleteErrors(object):
+class DeleteScenarios(Scenarios):
 
-    def __init__(self, resource, setup, teardown):
-        self.resource = resource
-        self.setup = setup
-        self.teardown = teardown
-
-    def run(self):
-        url = self.setup()
-        self.teardown(url)
+    def test_resource_does_not_exist_on_delete(self):
+        url = self.create_url()
+        self.delete_url(url)
 
         response = client.delete(url)
         a.assert_not_exists(response, self.resource)
