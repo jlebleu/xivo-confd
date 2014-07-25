@@ -11,62 +11,50 @@ not_associated_regex = re.compile(r"([\w_-]+) with id=\w+ is not associated with
 delete_regex = re.compile(r"Error while deleting ([\w_-]+): (.+)")
 
 
+def assert_error(response, regex, *statuses):
+    statuses = statuses or (400, 404)
+    response.assert_status(*statuses)
+    error = response.extract_error(regex)
+    return regex.match(error)
+
+
 def assert_missing_parameter(response, name):
-    response.assert_status(400)
-    error = response.extract_error(missing_regex)
-    assert_that(error, contains_string(name))
+    match = assert_error(response, missing_regex, 400)
+    assert_that(match.group(1), contains_string(name))
 
 
 def assert_invalid_parameter(response, name):
-    response.assert_status(400)
-    error = response.extract_error(invalid_regex)
-    assert_that(error, contains_string(name))
+    match = assert_error(response, invalid_regex, 400)
+    assert_that(match.group(1), contains_string(name))
 
 
 def assert_field_validation(response, expected_name, expected_type):
-    response.assert_status(400)
-    error = response.extract_error(validation_regex)
-    match = validation_regex.match(error)
-
+    match = assert_error(response, validation_regex, 400)
     name = match.group(1)
     field_type = match.group(3)
-
     assert_that(name, equal_to(expected_name))
     assert_that(field_type, equal_to(expected_type))
 
 
 def assert_not_exists(response, expected_resource):
-    response.assert_status(404)
-    error = response.extract_error(not_exists_regex)
-
-    resource = not_exists_regex.match(error).group(1)
-    assert_that(resource, equal_to(expected_resource))
+    match = assert_error(response, not_exists_regex, 404)
+    assert_that(match.group(1), equal_to(expected_resource))
 
 
 def assert_nonexistent_parameter(response, expected_field):
-    response.assert_status(400)
-    error = response.extract_error(nonexistent_regex)
-    match = nonexistent_regex.match(error)
-
-    field_name = match.group(1)
-    assert_that(field_name, equal_to(expected_field))
+    match = assert_error(response, nonexistent_regex, 400)
+    assert_that(match.group(1), equal_to(expected_field))
 
 
 def assert_not_associated(response, expected_left, expected_right):
-    response.assert_status(404)
-    error = response.extract_error(not_associated_regex)
-    match = not_associated_regex.match(error)
-
+    match = assert_error(response, not_associated_regex, 404)
     left, right = match.groups([1, 2])
     assert_that(left, equal_to(expected_left))
     assert_that(right, equal_to(expected_right))
 
 
 def assert_delete_error(response, expected_resource, expected_message):
-    response.assert_status(400)
-    error = response.extract_error(delete_regex)
-    match = delete_regex.match(error)
-
+    match = assert_error(response, delete_regex, 400)
     resource, message = match.groups([1, 2])
     assert_that(resource, equal_to(expected_resource))
     assert_that(message, equal_to(expected_message))
