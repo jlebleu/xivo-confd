@@ -85,3 +85,11 @@ def test_dissociate_second_user_before_first(first_user, second_user, line):
         url = DISSOCIATE_URL.format(first_user['id'], line['id'])
         response = client.delete(url)
         a.assert_invalid_parameter(response, 'There are secondary users associated to this line')
+
+
+@h.user.isolated_user()
+@h.line.isolated_line()
+def test_delete_user_when_user_and_line_associated(user, line):
+    with user_and_line_associated(user, line):
+        response = client.delete("/users/{}".format(user['id']))
+        a.assert_delete_error(response, 'User', 'user still associated to a line')

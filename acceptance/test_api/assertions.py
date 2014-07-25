@@ -8,6 +8,7 @@ validation_regex = re.compile(r"Error while validating field '([\w_-]+)': '(.*?)
 not_exists_regex = re.compile(r"([\w_-]+) with [\w_]*id=(\w+) does not exist")
 nonexistent_regex = re.compile(r"Nonexistent parameters: ([\w_-]+) \w+ does not exist")
 not_associated_regex = re.compile(r"([\w_-]+) with id=\w+ is not associated with ([\w_-]+) id=\w+")
+delete_regex = re.compile(r"Error while deleting ([\w_-]+): (.+)")
 
 
 def assert_missing_parameter(response, name):
@@ -59,3 +60,13 @@ def assert_not_associated(response, expected_left, expected_right):
     left, right = match.groups([1, 2])
     assert_that(left, equal_to(expected_left))
     assert_that(right, equal_to(expected_right))
+
+
+def assert_delete_error(response, expected_resource, expected_message):
+    response.assert_status(400)
+    error = response.extract_error(delete_regex)
+    match = delete_regex.match(error)
+
+    resource, message = match.groups([1, 2])
+    assert_that(resource, equal_to(expected_resource))
+    assert_that(message, equal_to(expected_message))
