@@ -4,8 +4,7 @@ from test_api.wrappers import IsolatedAction
 
 def add_user(**parameters):
     response = client.post("/users", parameters)
-    response.assert_status(201)
-    return response.json
+    return response.item
 
 
 def delete_user(user_id, check=False):
@@ -14,10 +13,14 @@ def delete_user(user_id, check=False):
         response.assert_status(204)
 
 
+def generate_user():
+    return add_user(firstname='John', lastname='Doe')
+
+
 class isolated_user(IsolatedAction):
 
     def __enter__(self):
-        self.user = add_user(firstname='firstname')
+        self.user = generate_user()
         return self.user
 
     def __exit__(self, *args):
