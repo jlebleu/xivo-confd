@@ -9,39 +9,14 @@ BOGUS = [('exten', 123, 'unicode string'),
          ('commented', 'true', 'boolean')]
 
 
-def test_errors_on_get():
-    scenarios = s.GetErrors("Extension",
-                            add_extension,
-                            delete_extension)
-    scenarios.run()
+class TestExtensionResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, s.DeleteScenarios):
 
+    url = "/extensions"
+    resource = "Extension"
+    required = REQUIRED
+    bogus_fields = BOGUS
 
-def test_errors_on_create():
-    scenarios = s.CreateErrors("/extensions",
-                               bogus_fields=BOGUS,
-                               required=REQUIRED)
-    scenarios.run()
-
-
-def test_errors_on_edit():
-    scenarios = s.EditErrors(add_extension,
-                             delete_extension,
-                             bogus_fields=BOGUS)
-    scenarios.run()
-
-
-def test_errors_on_delete():
-    scenarios = s.DeleteErrors("Extension",
-                               add_extension,
-                               delete_extension)
-    scenarios.run()
-
-
-def add_extension():
-    response = client.post("/extensions", {'context': 'default', 'exten': '1444'})
-    response.assert_status(201)
-    return "/extensions/{}".format(response.json['id'])
-
-
-def delete_extension(url):
-    client.delete(url)
+    def create_url(self):
+        response = client.post("/extensions", {'context': 'default', 'exten': '1444'})
+        response.assert_status(201)
+        return "/extensions/{}".format(response.json['id'])
