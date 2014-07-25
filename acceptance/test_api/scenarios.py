@@ -11,7 +11,7 @@ class Scenarios(object):
     bogus_fields = []
 
     @contextmanager
-    def url_for_test(self):
+    def generated_url(self):
         url = self.create_url()
         yield url
         self.delete_url(url)
@@ -54,12 +54,12 @@ class CreateScenarios(Scenarios):
 class EditScenarios(Scenarios):
 
     def test_invalid_parameter_on_put(self):
-        with self.url_for_test() as url:
+        with self.generated_url() as url:
             response = client.put(url, {'invalid': 'invalid'})
             a.assert_invalid_parameter(response, 'invalid')
 
     def test_wrong_parameter_type_on_put(self):
-        with self.url_for_test() as url:
+        with self.generated_url() as url:
             for bogus_field in self.bogus_fields:
                 yield self.check_bogus_field_on_put, url, bogus_field
 
