@@ -1,6 +1,7 @@
 from test_api import client
 from test_api import helpers as h
 from test_api import assertions as a
+from test_api import scenarios as s
 
 from contextlib import contextmanager
 
@@ -8,6 +9,14 @@ from contextlib import contextmanager
 FAKE_ID = 999999999
 ASSOCIATE_URL = "/users/{}/lines"
 DISSOCIATE_URL = "/users/{}/lines/{}"
+
+
+class TestUserLineResource(s.CreateScenarios):
+
+    resource = "UserLine"
+    url = "/users/1/lines"
+    required = ['line_id']
+    bogus_fields = [('line_id', '123', 'integer')]
 
 
 @contextmanager
