@@ -19,42 +19,17 @@ BOGUS = [
 ]
 
 
-def test_errors_on_get():
-    scenarios = s.GetErrors("Voicemail",
-                            add_voicemail,
-                            delete_voicemail)
-    scenarios.run()
+class TestVoicemailResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, s.DeleteScenarios):
 
+    url = "/voicemails"
+    resource = "Voicemail"
+    required = REQUIRED
+    bogus_fields = BOGUS
 
-def test_errors_on_create():
-    scenarios = s.CreateErrors("/voicemails",
-                               bogus_fields=BOGUS,
-                               required=REQUIRED)
-    scenarios.run()
-
-
-def test_errors_on_edit():
-    scenarios = s.EditErrors(add_voicemail,
-                             delete_voicemail,
-                             bogus_fields=BOGUS)
-    scenarios.run()
-
-
-def test_errors_on_delete():
-    scenarios = s.DeleteErrors("Voicemail",
-                               add_voicemail,
-                               delete_voicemail)
-    scenarios.run()
-
-
-def add_voicemail():
-    data = {'name': 'myvoicemail',
-            'number': '1444',
-            'context': 'default'}
-    response = client.post("/voicemails", data)
-    response.assert_status(201)
-    return "/voicemails/{}".format(response.json['id'])
-
-
-def delete_voicemail(url):
-    client.delete(url)
+    def create_url(self):
+        data = {'name': 'myvoicemail',
+                'number': '1444',
+                'context': 'default'}
+        response = client.post("/voicemails", data)
+        response.assert_status(201)
+        return "/voicemails/{}".format(response.json['id'])
