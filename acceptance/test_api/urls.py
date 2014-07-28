@@ -2,12 +2,14 @@
 URLS = {
     'user.get': '/users/{user_id}',
 
-    'extension_line': '/extensions/{extension_id}/line',
+    'extension_line.get': '/extensions/{extension_id}/line',
 
-    'line_extension': '/lines/{line_id}/extensions',
+    'line_extension.list': '/lines/{line_id}/extensions',
+    'line_extension.associate': '/lines/{line_id}/extensions',
     'line_extension.dissociate': '/lines/{line_id}/extensions/{extension_id}',
 
-    'user_line': '/users/{user_id}/lines',
+    'user_line.list': '/users/{user_id}/lines',
+    'user_line.associate': '/users/{user_id}/lines',
     'user_line.dissociate': '/users/{user_id}/lines/{line_id}',
 
 }
@@ -20,6 +22,9 @@ class url_map(object):
 
     def __call__(self, *args, **kwargs):
         return self.base.format(*args, **kwargs)
+
+    def __str__(self):
+        return self.base
 
 
 def url_for(resource):

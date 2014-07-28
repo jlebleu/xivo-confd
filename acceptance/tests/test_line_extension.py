@@ -7,9 +7,10 @@ from test_api import fixtures
 import re
 
 
-associate_url = url_for('line_extension')
+list_url = url_for('line_extension.list')
+associate_url = url_for('line_extension.associate')
 dissociate_url = url_for('line_extension.dissociate')
-extension_line_url = url_for('extension_line')
+extension_line_url = url_for('extension_line.get')
 
 FAKE_ID = 999999999
 

@@ -10,7 +10,8 @@ from contextlib import contextmanager
 
 FAKE_ID = 999999999
 
-associate_url = url_for('user_line')
+list_url = url_for('user_line.list')
+associate_url = url_for('user_line.associate')
 dissociate_url = url_for('user_line.dissociate')
 user_url = url_for('user.get')
 
