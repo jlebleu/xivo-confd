@@ -23,6 +23,26 @@ class TestUserLineResource(CreateScenarios):
     bogus_fields = [('line_id', '123', 'integer')]
 
 
+class TestUserLineAssociation(AssociationScenarios):
+
+    left_field = 'user_id'
+    right_field = 'line_id'
+    association_error_regex = re.compile(r"user is already associated to this line")
+
+    def create_resources(self):
+        user = helpers.user.generate_user()
+        line = helpers.line.generate_line()
+        return user['id'], line['id']
+
+    def delete_resources(self, user_id, line_id):
+        helpers.user.delete_user(user_id)
+        helpers.line.delete_line(line_id)
+
+    def associate_resources(self, user_id, line_id):
+        url = associate_url(user_id=user_id)
+        return client.post(url, line_id=line_id)
+
+
 @contextmanager
 def user_and_line_associated(user, line):
     url = associate_url(user_id=user['id'])

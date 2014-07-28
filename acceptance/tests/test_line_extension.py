@@ -49,6 +49,26 @@ class TestGetLineFromExtension(TestGetExtensionsFromLine):
         return extension_line_url(extension_id=self.extension['id'])
 
 
+class TestLineExtensionAssociation(AssociationScenarios):
+
+    left_field = 'line_id'
+    right_field = 'extension_id'
+    association_error_regex = re.compile(r"line with id \d+ already has an extension with a context of type 'internal'")
+
+    def create_resources(self):
+        line = generate_line()
+        extension = generate_extension()
+        return line['id'], extension['id']
+
+    def delete_resources(self, line_id, extension_id):
+        delete_line(line_id)
+        delete_extension(extension_id)
+
+    def associate_resources(self, line_id, extension_id):
+        url = associate_url(line_id=line_id)
+        return client.post(url, extension_id=extension_id)
+
+
 @fixtures.line()
 @fixtures.extension()
 def test_get_line_when_not_associated(line, extension):

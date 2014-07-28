@@ -77,3 +77,32 @@ class DeleteScenarios(Scenarios):
 
         response = client.delete(url)
         a.assert_not_exists(response, self.resource)
+
+
+class AssociationScenarios(object):
+
+    FAKE_ID = 999999999
+
+    @contextmanager
+    def generated_resources(self):
+        left_id, right_id = self.create_resources()
+        yield left_id, right_id
+        self.delete_resources(left_id, right_id)
+
+    def test_association_when_left_does_not_exist(self):
+        with self.generated_resources() as (left_id, right_id):
+            response = self.associate_resources(self.FAKE_ID, right_id)
+            a.assert_nonexistent_parameter(response, self.left_field)
+
+    def test_association_when_right_does_not_exist(self):
+        with self.generated_resources() as (left_id, right_id):
+            response = self.associate_resources(left_id, self.FAKE_ID)
+            a.assert_nonexistent_parameter(response, self.right_field)
+
+    def test_association_when_resources_already_associated(self):
+        with self.generated_resources() as (left_id, right_id):
+            response = self.associate_resources(left_id, right_id)
+            response.assert_status(201)
+
+            response = self.associate_resources(left_id, right_id)
+            a.assert_error(response, self.association_error_regex, 400)
