@@ -1,6 +1,5 @@
 from test_api import client
 from test_api import config
-from test_api.wrappers import IsolatedAction
 
 
 def generate_extension(context=config.CONTEXT):
@@ -26,17 +25,3 @@ def delete_extension(extension_id, check=False):
     response = client.delete("/extensions/{}".format(extension_id))
     if check:
         response.assert_status(204)
-
-
-class isolated_extension(IsolatedAction):
-
-    def __init__(self, context=config.CONTEXT):
-        super(isolated_extension, self).__init__()
-        self.context = context
-
-    def __enter__(self):
-        self.extension = generate_extension(self.context)
-        return self.extension
-
-    def __exit__(self, *args):
-        delete_extension(self.extension['id'])

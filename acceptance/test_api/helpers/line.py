@@ -1,6 +1,5 @@
 from test_api import client
 from test_api import config
-from test_api.wrappers import IsolatedAction
 
 
 def add_line(**parameters):
@@ -16,13 +15,3 @@ def delete_line(line_id, check=False):
 
 def generate_line():
     return add_line(context=config.CONTEXT, device_slot=1)
-
-
-class isolated_line(IsolatedAction):
-
-    def __enter__(self):
-        self.line = generate_line()
-        return self.line
-
-    def __exit__(self, *args):
-        delete_line(self.line['id'], check=False)
