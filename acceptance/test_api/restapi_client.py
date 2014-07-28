@@ -58,23 +58,32 @@ class RestApiClient(object):
 
 class Response(object):
 
+    STATUS_OK = (200, 201, 204)
+
     def __init__(self, response):
         self.response = response
+
+    @property
+    def raw(self):
+        return self.response.text
 
     @property
     def json(self):
         return self.response.json() if self.response.text else None
 
     @property
-    def raw(self):
-        return self.response.text
+    def item(self):
+        self.assert_status(*self.STATUS_OK)
+        return self.json
+
+    @property
+    def items(self):
+        self.assert_status(*self.STATUS_OK)
+        assert_that(self.json, has_key('items'))
+        return self.json['items']
 
     def assert_status(self, *statuses):
         assert_that(self.response.status_code, is_in(statuses), self.response.text)
-
-    def assert_regex(self, regex):
-        msg = "'%s' does not match on '%s'" % (regex.pattern, self.response.text)
-        assert_that(regex.search(self.response.text), msg)
 
     def extract_error(self, regex):
         for msg in self.json:
@@ -83,17 +92,3 @@ class Response(object):
 
         error_msg = "no errors matching '{}'. errors found: {}"
         raise AssertionError(error_msg.format(regex.pattern, self.json))
-
-    @property
-    def content(self):
-        self.assert_status(200, 201, 204)
-        return self.json
-
-    @property
-    def item(self):
-        return self.content
-
-    @property
-    def items(self):
-        assert_that(self.content, has_key('items'))
-        return self.content['items']
