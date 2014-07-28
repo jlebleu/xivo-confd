@@ -79,15 +79,25 @@ class DeleteScenarios(Scenarios):
         a.assert_not_exists(response, self.resource)
 
 
-class AssociationScenarios(object):
+class RelationScenario(object):
 
     FAKE_ID = 999999999
+
+    left_resource = None
+    left_field = None
+    right_resource = None
+    right_field = None
+    associated_error = None
+    not_associated_erorr = None
 
     @contextmanager
     def generated_resources(self):
         left_id, right_id = self.create_resources()
         yield left_id, right_id
         self.delete_resources(left_id, right_id)
+
+
+class AssociationScenarios(RelationScenario):
 
     def test_association_when_left_does_not_exist(self):
         with self.generated_resources() as (left_id, right_id):
@@ -105,4 +115,30 @@ class AssociationScenarios(object):
             response.assert_status(201)
 
             response = self.associate_resources(left_id, right_id)
-            a.assert_error(response, self.association_error_regex, 400)
+            a.assert_error(response, self.associated_error, 400)
+
+
+class AssociationGetScenarios(RelationScenario):
+
+    def test_get_association_when_left_does_not_exist(self):
+        with self.generated_resources() as (left_id, right_id):
+            response = self.get_association(self.FAKE_ID, right_id)
+            a.assert_not_exists(response, self.left_resource)
+
+
+class DissociationScenarios(RelationScenario):
+
+    def test_dissociation_when_left_does_not_exist(self):
+        with self.generated_resources() as (left_id, right_id):
+            response = self.dissociate_resources(self.FAKE_ID, right_id)
+            a.assert_nonexistent_parameter(response, self.left_field, 404)
+
+    def test_dissociation_when_right_does_not_exist(self):
+        with self.generated_resources() as (left_id, right_id):
+            response = self.dissociate_resources(left_id, self.FAKE_ID)
+            a.assert_nonexistent_parameter(response, self.right_field, 400)
+
+    def test_dissociation_when_not_associated(self):
+        with self.generated_resources() as (left_id, right_id):
+            response = self.dissociate_resources(left_id, right_id)
+            a.assert_error(response, self.not_associated_error, 400)
