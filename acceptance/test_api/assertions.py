@@ -41,8 +41,8 @@ def assert_not_exists(response, expected_resource):
     assert_that(match.group(1), equal_to(expected_resource))
 
 
-def assert_nonexistent_parameter(response, expected_field):
-    match = assert_error(response, nonexistent_regex, 400)
+def assert_nonexistent_parameter(response, expected_field, status=400):
+    match = assert_error(response, nonexistent_regex, status)
     assert_that(match.group(1), equal_to(expected_field))
 
 
