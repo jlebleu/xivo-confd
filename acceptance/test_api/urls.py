@@ -1,31 +1,37 @@
+class UrlFragment(object):
 
-URLS = {
-    'user.get': '/users/{user_id}',
+    @classmethod
+    def new(cls, base=''):
+        return cls([base])
 
-    'extension_line.get': '/extensions/{extension_id}/line',
+    def __init__(self, fragments):
+        self.fragments = fragments
 
-    'line_extension.list': '/lines/{line_id}/extensions',
-    'line_extension.associate': '/lines/{line_id}/extensions',
-    'line_extension.dissociate': '/lines/{line_id}/extensions/{extension_id}',
+    def __call__(self, value=None, param=None):
+        return self._build(self._add(value, param))
 
-    'user_line.list': '/users/{user_id}/lines',
-    'user_line.associate': '/users/{user_id}/lines',
-    'user_line.dissociate': '/users/{user_id}/lines/{line_id}',
-
-}
-
-
-class url_map(object):
-
-    def __init__(self, base):
-        self.base = base
-
-    def __call__(self, *args, **kwargs):
-        return self.base.format(*args, **kwargs)
+    def __getattr__(self, name):
+        return self._build(self._add(name))
 
     def __str__(self):
-        return self.base
+        full_url = '/'.join(self.fragments)
+        return full_url
 
+    def __repr__(self):
+        return '<UrlFragment {} {}>'.format(str(self), self.fragments)
 
-def url_for(resource):
-    return url_map(URLS[resource])
+    def apply(self, **kwargs):
+        fragments = [f.format(**kwargs) for f in self.fragments]
+        return self._build(fragments)
+
+    def _build(self, fragments):
+        return self.__class__(fragments)
+
+    def _add(self, value=None, param=None):
+        if value and param:
+            raise ValueError("value and param are mutually exclusive")
+        if value:
+            return self.fragments + [str(value)]
+        if param:
+            return self.fragments + ['{{{}}}'.format(param)]
+        return self.fragments
