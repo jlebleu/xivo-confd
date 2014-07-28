@@ -25,7 +25,7 @@ class RestApiClient(object):
         full_url = self._build_url(url)
         data = self._encode_dict(data)
 
-        logger.debug('Request - %s %s params: %s body: %s', method, full_url, parameters, data)
+        logger.info('%s %s params: %s body: %s', method, full_url, parameters, data)
         response = self.session.request(method, full_url, params=parameters, data=data)
 
         logger.debug('Response - %s %s', response.status_code, response.text)
@@ -80,7 +80,9 @@ class Response(object):
         for msg in self.json:
             if regex.search(msg):
                 return msg
-        raise AssertionError("did not find any error message matching '%s'" % regex.pattern)
+
+        error_msg = "no errors matching '{}'. errors found: {}"
+        raise AssertionError(error_msg.format(regex.pattern, self.json))
 
     @property
     def content(self):
