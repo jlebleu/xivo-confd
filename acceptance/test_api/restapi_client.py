@@ -2,6 +2,7 @@ import requests
 import logging
 import json
 from hamcrest import assert_that, is_in, has_key
+from urls import UrlFragment
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +55,36 @@ class RestApiClient(object):
 
     def _build_url(self, url):
         return '/'.join((self.base_url, url.lstrip('/')))
+
+    @property
+    def url(self):
+        return RestUrlClient(self, [''])
+
+
+class RestUrlClient(UrlFragment):
+
+    def __init__(self, client, fragments):
+        super(RestUrlClient, self).__init__(fragments)
+        self.client = client
+
+    def _build(self, fragments):
+        return RestUrlClient(self.client, fragments)
+
+    def get(self, **params):
+        url = str(self)
+        return self.client.get(url, **params)
+
+    def post(self, **data):
+        url = str(self)
+        return self.client.post(url, **data)
+
+    def put(self, **data):
+        url = str(self)
+        return self.client.put(url, **data)
+
+    def delete(self):
+        url = str(self)
+        return self.client.delete(url)
 
 
 class Response(object):
