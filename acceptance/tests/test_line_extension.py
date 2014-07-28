@@ -2,6 +2,7 @@ from test_api import helpers as h
 from test_api import scenarios as s
 from test_api import assertions as a
 from test_api import client
+from test_api import fixtures
 import re
 
 
@@ -44,38 +45,38 @@ class TestGetLineFromExtension(TestGetExtensionsFromLine):
         return EXTENSION_LINE.format(self.extension['id'])
 
 
-@h.line.isolated_line()
-@h.extension.isolated_extension()
+@fixtures.line()
+@fixtures.extension()
 def test_get_line_when_not_associated(line, extension):
     response = client.get(EXTENSION_LINE.format(extension['id']))
     a.assert_error(response, not_associated_line_regex)
 
 
-@h.line.isolated_line()
+@fixtures.line()
 def test_associate_when_extension_does_not_exist(line):
     url = ASSOCIATION_URL.format(line['id'])
     response = client.post(url, {'extension_id': FAKE_ID})
     a.assert_nonexistent_parameter(response, 'extension_id')
 
 
-@h.extension.isolated_extension()
+@fixtures.extension()
 def test_associate_when_line_does_not_exist(extension):
     url = ASSOCIATION_URL.format(FAKE_ID)
     response = client.post(url, {'extension_id': extension['id']})
     a.assert_nonexistent_parameter(response, 'line_id')
 
 
-@h.extension.isolated_extension('from-extern')
-@h.line.isolated_line()
+@fixtures.extension('from-extern')
+@fixtures.line()
 def test_associate_incall_to_line_without_user(incall, line):
     url = ASSOCIATION_URL.format(line['id'])
     response = client.post(url, {'extension_id': incall['id']})
     a.assert_error(response, not_associated_user_regex)
 
 
-@h.extension.isolated_extension()
-@h.extension.isolated_extension()
-@h.line.isolated_line()
+@fixtures.extension()
+@fixtures.extension()
+@fixtures.line()
 def test_associate_two_internal_extensions_to_same_line(first_extension, second_extension, line):
     url = ASSOCIATION_URL.format(line['id'])
     response = client.post(url, {'extension_id': first_extension['id']})
@@ -85,7 +86,7 @@ def test_associate_two_internal_extensions_to_same_line(first_extension, second_
     a.assert_invalid_parameter(response, already_associated_msg.format(line['id']))
 
 
-@h.line.isolated_line()
+@fixtures.line()
 def test_dissociate_when_line_does_not_exist(line):
     url = DISSOCIATION_URL.format(line['id'], FAKE_ID)
     response = client.delete(url)
