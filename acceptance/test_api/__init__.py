@@ -1,6 +1,8 @@
 from xivo_lettuce.config import read_config
 from restapi_client import RestApiClient
 
+from urls import url_for, url_map
+
 client = None
 
 

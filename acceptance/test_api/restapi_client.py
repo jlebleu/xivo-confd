@@ -34,10 +34,14 @@ class RestApiClient(object):
     def get(self, url, **parameters):
         return self.request('GET', url, parameters=parameters)
 
-    def post(self, url, data):
+    def post(self, url, data=None, **kwargs):
+        data = data or {}
+        data.update(kwargs)
         return self.request('POST', url, data=data)
 
-    def put(self, url, data):
+    def put(self, url, data=None, **kwargs):
+        data = data or {}
+        data.update(kwargs)
         return self.request('PUT', url, data=data)
 
     def delete(self, url):
