@@ -1,7 +1,8 @@
+import re
+from test_api.scenarios import CreateScenarios, AssociationScenarios
+from test_api import helpers
 from test_api import client, url_for
-from test_api import helpers as h
 from test_api import assertions as a
-from test_api import scenarios as s
 from test_api import fixtures
 
 from contextlib import contextmanager
@@ -13,7 +14,8 @@ associate_url = url_for('user_line')
 dissociate_url = url_for('user_line.dissociate')
 user_url = url_for('user.get')
 
-class TestUserLineResource(s.CreateScenarios):
+
+class TestUserLineResource(CreateScenarios):
 
     resource = "UserLine"
     url = associate_url(user_id=FAKE_ID)

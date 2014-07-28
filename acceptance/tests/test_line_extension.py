@@ -1,5 +1,6 @@
-from test_api import helpers as h
-from test_api import scenarios as s
+from test_api.helpers.line import generate_line, delete_line
+from test_api.helpers.extension import generate_extension, delete_extension
+from test_api.scenarios import GetScenarios, AssociationScenarios
 from test_api import assertions as a
 from test_api import client, url_for
 from test_api import fixtures
@@ -17,13 +18,13 @@ not_associated_user_regex = re.compile(r"line with id \d+ is not associated to a
 already_associated_msg = "line with id {} already has an extension with a context of type 'internal'"
 
 
-class TestGetExtensionsFromLine(s.GetScenarios):
+class TestGetExtensionsFromLine(GetScenarios):
 
     resource = "Line"
 
     def create_url(self):
-        self.line = h.line.generate_line()
-        self.extension = h.extension.generate_extension()
+        self.line = generate_line()
+        self.extension = generate_extension()
 
         url = associate_url(line_id=self.line['id'])
         response = client.post(url, extension_id=self.extension['id'])
@@ -34,8 +35,9 @@ class TestGetExtensionsFromLine(s.GetScenarios):
     def delete_url(self, url):
         url = dissociate_url(line_id=self.line['id'], extension_id=self.extension['id'])
         client.delete(url)
-        h.line.delete_line(self.line['id'])
-        h.extension.delete_extension(self.extension['id'])
+
+        delete_line(self.line['id'])
+        delete_extension(self.extension['id'])
 
 
 class TestGetLineFromExtension(TestGetExtensionsFromLine):
