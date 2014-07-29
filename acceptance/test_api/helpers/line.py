@@ -10,7 +10,7 @@ def add_line(**parameters):
 def delete_line(line_id, check=False):
     response = client.delete("/lines_sip/{}".format(line_id))
     if check:
-        response.assert_status(204)
+        response.assert_ok()
 
 
 def generate_line():

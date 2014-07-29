@@ -9,7 +9,7 @@ def add_user(**parameters):
 def delete_user(user_id, check=False):
     response = client.delete("/users/{}".format(user_id))
     if check:
-        response.assert_status(204)
+        response.assert_ok()
 
 
 def generate_user():

@@ -24,4 +24,4 @@ def add_extension(**params):
 def delete_extension(extension_id, check=False):
     response = client.delete("/extensions/{}".format(extension_id))
     if check:
-        response.assert_status(204)
+        response.assert_ok()

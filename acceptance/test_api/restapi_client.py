@@ -104,17 +104,20 @@ class Response(object):
 
     @property
     def item(self):
-        self.assert_status(*self.STATUS_OK)
+        self.assert_ok()
         return self.json
 
     @property
     def items(self):
-        self.assert_status(*self.STATUS_OK)
+        self.assert_ok()
         assert_that(self.json, has_key('items'))
         return self.json['items']
 
     def assert_status(self, *statuses):
         assert_that(self.response.status_code, is_in(statuses), self.response.text)
+
+    def assert_ok(self):
+        self.assert_status(*self.STATUS_OK)
 
     def extract_error(self, regex):
         for msg in self.json:
