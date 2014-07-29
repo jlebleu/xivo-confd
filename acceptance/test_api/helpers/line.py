@@ -1,14 +1,14 @@
-from test_api import client
+from test_api import restapi
 from test_api import config
 
 
-def add_line(**parameters):
-    response = client.post("/lines_sip", parameters)
+def add_line(**params):
+    response = restapi.lines_sip.post(params)
     return response.item
 
 
 def delete_line(line_id, check=False):
-    response = client.delete("/lines_sip/{}".format(line_id))
+    response = restapi.lines_sip(line_id).delete()
     if check:
         response.assert_ok()
 
