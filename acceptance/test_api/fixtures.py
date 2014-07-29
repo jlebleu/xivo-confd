@@ -8,33 +8,19 @@ from helpers.extension import generate_extension, delete_extension
 
 class user(IsolatedAction):
 
-    def __enter__(self):
-        self.user = generate_user()
-        return self.user
-
-    def __exit__(self, *args):
-        delete_user(self.user['id'], check=False)
+    actions = {'generate': generate_user,
+               'delete': delete_user}
 
 
 class line(IsolatedAction):
 
-    def __enter__(self):
-        self.line = generate_line()
-        return self.line
-
-    def __exit__(self, *args):
-        delete_line(self.line['id'], check=False)
+    actions = {'generate': generate_line,
+               'delete': delete_line}
 
 
 class extension(IsolatedAction):
 
-    def __init__(self, context=config.CONTEXT):
-        super(extension, self).__init__()
-        self.context = context
+    actions = {'generate': generate_extension,
+               'delete': delete_extension}
 
-    def __enter__(self):
-        self.extension = generate_extension(self.context)
-        return self.extension
 
-    def __exit__(self, *args):
-        delete_extension(self.extension['id'])
