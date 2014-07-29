@@ -29,10 +29,9 @@ class TestUserResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, s.Del
     required = REQUIRED
     bogus_fields = BOGUS
 
-    def create_url(self):
+    def create_resource(self):
         user = generate_user()
-        url = restapi.users(user['id'])
-        return str(url)
+        return user['id']
 
     def test_invalid_mobile_phone_number(self):
         response = restapi.users.post(firstname='firstname',

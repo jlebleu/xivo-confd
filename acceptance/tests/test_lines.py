@@ -1,6 +1,5 @@
 from test_api import scenarios as s
 from test_api.helpers.line import generate_line
-from test_api import restapi
 
 
 REQUIRED = ['context', 'device_slot']
@@ -16,7 +15,6 @@ class TestLineResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, s.Del
     required = REQUIRED
     bogus_fields = BOGUS
 
-    def create_url(self):
+    def create_resource(self):
         line = generate_line()
-        url = restapi.lines_sip(line['id'])
-        return str(url)
+        return line['id']

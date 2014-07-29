@@ -6,26 +6,32 @@ import assertions as a
 
 class Scenarios(object):
 
+    url = None
     resource = None
     required = []
     bogus_fields = []
 
     @contextmanager
     def generated_url(self):
-        url = self.create_url()
-        yield url
-        self.delete_url(url)
+        resource_id = self.create_resource()
+        yield self.generate_url(resource_id)
+        self.delete_resource(resource_id)
 
-    def delete_url(self, url):
+    def generate_url(self, resource_id):
+        return "{}/{}".format(self.url, resource_id)
+
+    def delete_resource(self, resource_id):
+        url = self.generate_url(resource_id)
         client.delete(url)
 
 
 class GetScenarios(Scenarios):
 
     def test_resource_does_not_exist_on_get(self):
-        url = self.create_url()
-        self.delete_url(url)
+        resource_id = self.create_resource()
+        self.delete_resource(resource_id)
 
+        url = self.generate_url(resource_id)
         response = client.get(url)
         a.assert_not_exists(response, self.resource)
 
@@ -55,7 +61,7 @@ class EditScenarios(Scenarios):
 
     def test_invalid_parameter_on_put(self):
         with self.generated_url() as url:
-            response = client.put(url, {'invalid': 'invalid'})
+            response = client.put(url, invalid='invalid')
             a.assert_invalid_parameter(response, 'invalid')
 
     def test_wrong_parameter_type_on_put(self):
@@ -72,9 +78,10 @@ class EditScenarios(Scenarios):
 class DeleteScenarios(Scenarios):
 
     def test_resource_does_not_exist_on_delete(self):
-        url = self.create_url()
-        self.delete_url(url)
+        resource_id = self.create_resource()
+        self.delete_resource(resource_id)
 
+        url = self.generate_url(resource_id)
         response = client.delete(url)
         a.assert_not_exists(response, self.resource)
 

@@ -1,5 +1,4 @@
 from test_api import scenarios as s
-from test_api import restapi
 from test_api.helpers.device import generate_device
 
 
@@ -24,7 +23,6 @@ class TestDeviceResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, s.D
     required = []
     bogus_fields = BOGUS
 
-    def create_url(self):
+    def create_resource(self):
         device = generate_device()
-        url = restapi.devices(device['id'])
-        return str(url)
+        return device['id']

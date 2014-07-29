@@ -1,6 +1,5 @@
 from test_api import scenarios as s
 from test_api.helpers.extension import generate_extension
-from test_api import restapi
 
 
 REQUIRED = ['exten', 'context']
@@ -17,7 +16,6 @@ class TestExtensionResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, 
     required = REQUIRED
     bogus_fields = BOGUS
 
-    def create_url(self):
+    def create_resource(self):
         extension = generate_extension()
-        url = restapi.extensions(extension['id'])
-        return str(url)
+        return extension['id']
