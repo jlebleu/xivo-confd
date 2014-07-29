@@ -2,12 +2,12 @@ import re
 import unittest
 
 from test_api.scenarios import AssociationScenarios, DissociationScenarios, AssociationGetScenarios
-from test_api import helpers
+from test_api.helpers.user import generate_user, delete_user
+from test_api.helpers.line import generate_line, delete_line
+from test_api.helpers.user_line import user_and_line_associated
 from test_api import restapi
 from test_api import assertions as a
 from test_api import fixtures
-
-from contextlib import contextmanager
 
 
 FAKE_ID = 999999999
@@ -23,13 +23,13 @@ class TestUserLineAssociation(AssociationScenarios, DissociationScenarios, Assoc
     not_associated_error = re.compile(r"user is not associated")
 
     def create_resources(self):
-        user = helpers.user.generate_user()
-        line = helpers.line.generate_line()
+        user = generate_user()
+        line = generate_line()
         return user['id'], line['id']
 
     def delete_resources(self, user_id, line_id):
-        helpers.user.delete_user(user_id)
-        helpers.line.delete_line(line_id)
+        delete_user(user_id)
+        delete_line(line_id)
 
     def associate_resources(self, user_id, line_id):
         return restapi.users(user_id).lines.post(line_id=line_id)
@@ -51,14 +51,6 @@ class TestUserLineAssociation(AssociationScenarios, DissociationScenarios, Assoc
     @unittest.skip("will be fixed after refactoring DAO exceptions")
     def test_dissociation_when_right_does_not_exist(self):
         pass
-
-
-@contextmanager
-def user_and_line_associated(user, line):
-    response = restapi.users(user['id']).lines.post(line_id=line['id'])
-    response.assert_status(201)
-    yield
-    restapi.users(user['id']).lines(line['id']).delete()
 
 
 @fixtures.user()
