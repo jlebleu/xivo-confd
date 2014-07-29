@@ -74,13 +74,13 @@ class RestUrlClient(UrlFragment):
         url = str(self)
         return self.client.get(url, **params)
 
-    def post(self, **data):
+    def post(self, data=None, **params):
         url = str(self)
-        return self.client.post(url, **data)
+        return self.client.post(url, data, **params)
 
-    def put(self, **data):
+    def put(self, data=None, **params):
         url = str(self)
-        return self.client.put(url, **data)
+        return self.client.put(url, data, **params)
 
     def delete(self):
         url = str(self)
