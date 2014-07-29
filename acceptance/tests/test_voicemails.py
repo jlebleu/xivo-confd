@@ -1,5 +1,6 @@
 from test_api import scenarios as s
-from test_api import client
+from test_api import restapi
+from test_api.helpers.voicemail import generate_voicemail
 
 
 REQUIRED = ['name', 'number', 'context']
@@ -27,9 +28,6 @@ class TestVoicemailResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, 
     bogus_fields = BOGUS
 
     def create_url(self):
-        data = {'name': 'myvoicemail',
-                'number': '1444',
-                'context': 'default'}
-        response = client.post("/voicemails", data)
-        response.assert_status(201)
-        return "/voicemails/{}".format(response.json['id'])
+        voicemail = generate_voicemail()
+        url = restapi.voicemails(voicemail['id'])
+        return str(url)
