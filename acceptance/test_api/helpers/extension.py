@@ -3,18 +3,18 @@ from test_api import config
 
 
 def generate_extension(context=config.CONTEXT):
-    exten = find_available_exten(context, config.EXTENSION_RANGE)
+    exten = find_available_exten(context)
     return add_extension(exten=exten, context=context)
 
 
-def find_available_exten(context, number_range):
-    response = client.get("/extensions")
+def find_available_exten(context):
     response = restapi.extensions.get()
     numbers = [int(e['exten'])
                for e in response.items
                if e['context'] == context and e['exten'].isdigit()]
 
-    return str((set(number_range) - set(numbers)).pop())
+    available = set(config.EXTENSION_RANGE) - set(numbers)
+    return str(available.pop())
 
 
 def add_extension(**params):
