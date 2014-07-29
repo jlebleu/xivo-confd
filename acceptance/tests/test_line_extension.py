@@ -4,6 +4,7 @@ from test_api.scenarios import AssociationScenarios, DissociationScenarios, Asso
 from test_api import assertions as a
 from test_api import restapi
 from test_api import fixtures
+
 import re
 import unittest
 

@@ -57,9 +57,7 @@ class TestUserLineAssociation(AssociationScenarios, DissociationScenarios, Assoc
 def user_and_line_associated(user, line):
     response = restapi.users(user['id']).lines.post(line_id=line['id'])
     response.assert_status(201)
-
     yield
-
     restapi.users(user['id']).lines(line['id']).delete()
 
 
