@@ -1,5 +1,6 @@
 from test_api import scenarios as s
-from test_api import client
+from test_api import restapi
+from test_api.helpers.device import generate_device
 
 
 FIELDS = ['ip',
@@ -12,7 +13,6 @@ FIELDS = ['ip',
           'description',
           'template_id']
 
-REQUIRED = []
 
 BOGUS = [(f, 123, 'unicode string') for f in FIELDS]
 
@@ -21,10 +21,10 @@ class TestDeviceResource(s.GetScenarios, s.CreateScenarios, s.EditScenarios, s.D
 
     url = "/devices"
     resource = "device"
-    required = REQUIRED
+    required = []
     bogus_fields = BOGUS
 
     def create_url(self):
-        response = client.post("/devices", {})
-        response.assert_status(201)
-        return "/devices/{}".format(response.json['id'])
+        device = generate_device()
+        url = restapi.devices(device['id'])
+        return str(url)
